@@ -17,14 +17,11 @@ namespace Group_Rps
 
             while(true){
             //menu here
-            Console.WriteLine("Here are your options: \n0. Play Rock-Paper-Scissors\n1. View Stats\n2. Sign out\n3. Quit game");
+            Console.WriteLine("Here are your options: \n1. Play Rock-Paper-Scissors\n2. Sign out\n3. Quit game");
             string startmenu;
             startmenu = Console.ReadLine();
-            if(startmenu == "0"){
+            if(startmenu == "1"){
                 GameLoop();
-            }
-            else if(startmenu =="1"){
-                ViewStats();
             }
             else if(startmenu == "2"){
                 SignIn();
@@ -37,7 +34,6 @@ namespace Group_Rps
         }
 
         public static void GameLoop(){
-            #region game loop
             //while wins < 2
             int playerWins = 0;
             int compWins = 0;
@@ -54,8 +50,10 @@ namespace Group_Rps
                 string userResponse = Console.ReadLine().ToLower();
                 if(userResponse=="1"||userResponse=="2"||userResponse=="3"){
                     //new round
+
                     Round round = new Round();
                     roundNumber++;
+                    Console.WriteLine($"This is round {roundNumber}!");
                     Dictionary<int,string> answers = new Dictionary<int,string>();
                     //rock beats scissors
                     answers.Add(1,"3");
@@ -113,15 +111,14 @@ namespace Group_Rps
                     }
                     rounds.Add(round);
                     currentMatch.Rounds.Add(round);
-                    Console.WriteLine($"{currentMatch.Player2.Fname} has {playerWins}.{currentMatch.Player1.Fname} has {compWins}. ");
+                    Console.WriteLine($"{currentMatch.Player2.Fname} has {playerWins} wins.{currentMatch.Player1.Fname} has {compWins} wins. ");
                 }
                 else{
                     Console.WriteLine("Ummm, try again...\n\n");
                 }
             }
             Console.WriteLine($"{currentMatch.MatchWinner().Fname} won the game!!!");
-
-            #endregion
+            Console.WriteLine($"{roundNumber} rounds were played! There were {roundNumber-compWins-playerWins} ties, {currentMatch.Player1.Fname} won {compWins} times, and {currentMatch.Player2.Fname} won {playerWins} times!");
         }
 
         public static void ViewStats(){
@@ -130,18 +127,16 @@ namespace Group_Rps
         }
 
         public static void SignIn(){
+            if(!players.ContainsKey("Karen Plankton")){
             Player p1 = new Player()
             {
                 Fname = "Karen",
                 Lname = "Plankton"
             };
             players.Add(p1.Fname+" "+p1.Lname, p1);
+            }
 
             Console.WriteLine("This is The Official Batch Rock-Paper-Scissors Game");
-
-
-
-            #region name stuff
 
             string[] userNamesArray;
             do
@@ -150,6 +145,8 @@ namespace Group_Rps
                 string userNames = Console.ReadLine();
                 userNamesArray = userNames.Split(' ');
             } while (userNamesArray[0] == "");
+
+
 
             Player p2 = new Player();
 
@@ -165,7 +162,20 @@ namespace Group_Rps
                 p2.Fname = userNamesArray[0];
                 p2.Lname = userNamesArray[1];
             }
-#endregion
+            //if player isn't in dictionary, add player to dictionary
+            if(!players.ContainsKey($"{p2.Fname} {p2.Lname}")){
+                players.Add($"{p2.Fname} {p2.Lname}",p2);
+            }
+
+            //whether or not a new player was added to the dictionary, retrieve the currentPlayer from the dictionary
+            currentPlayer = players[$"{p2.Fname} {p2.Lname}"];
+
+            //list every player in the dictionary to ensure signing out works
+            foreach(string playerName in players.Keys){
+                Console.WriteLine(playerName+" is a registered player.");
+
+            }
+            Console.WriteLine();
 
         }
 

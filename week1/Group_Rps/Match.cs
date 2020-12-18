@@ -30,7 +30,7 @@ namespace Group_Rps
             if(p==null){
                 ties++;
             }
-            if (p.PlayerId == Player1.PlayerId)
+            else if (p.PlayerId == Player1.PlayerId)
             {
                 p1RoundWins++;
             }
