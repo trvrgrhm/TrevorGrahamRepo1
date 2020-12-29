@@ -17,6 +17,9 @@ namespace StoreApplication.UI
         StoreSession session = new StoreSession();
         Menu currentMenu = Menu.Welcome;
         public void Start(){
+            //make sure usable data exists
+            session.PopulateDb();
+            //start program loop
             while(true){
                 switch(currentMenu){
                     case Menu.Welcome: WelcomeMenu();
@@ -24,6 +27,8 @@ namespace StoreApplication.UI
                     case Menu.SignIn: SignInMenu();
                     break;
                     case Menu.Signup: SignUpMenu();
+                    break;
+                    case Menu.ChooseStore: ChooseStore();
                     break;
                     case Menu.Main: MainMenu();
                     break;
@@ -79,6 +84,46 @@ namespace StoreApplication.UI
             }
         }
 
+        void ChooseStore(){
+            //check if user is signed in?
+            if(!session.IsLoggedIn()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+            }
+            else{
+                //successfully logged in
+                Console.WriteLine($"\nWelcome {session.GetCustomerFname()}!\n");
+                //
+                if(session.CartIsEmpty()){
+                    Console.WriteLine("You don't have anything in your cart.");
+                }
+
+                string makeChoice = ("\nWhat would you like to do?\n");
+                List<string> options = new List<string>();
+                options.Add("Exit");
+                options.Add("Go Back to Main Menu");
+                string[] storeNames = session.GetAllStoreNames().ToArray();
+                foreach(string storeName in storeNames){
+                    options.Add($"Go to the {storeName} Shop");
+                }
+                int choice = ChooseOptionFromList(intro: makeChoice, options:options.ToArray());
+                switch(choice){
+                    //if sign-in is successful, move to main menu, otherwise, stay in sign in menu
+                    case 0:Environment.Exit(0);
+                    break;
+                    case 1:currentMenu = Menu.Main;
+                    break; 
+                    default: //attempt to choose store;if successful, go to products menu
+                        if(session.AttemptChooseStore(storeNames[choice-2])){
+                        currentMenu = Menu.ViewProducts;}
+                    break;
+                }
+            }
+
+        }
+        void ViewProducts(){
+
+        }
         void SignInMenu(){
             Console.Write("Please enter your username: ");
             string username = Console.ReadLine();
@@ -218,12 +263,13 @@ namespace StoreApplication.UI
         SignIn,
         Signup,
         Main,
-        //implemented ^
-        ViewPurchaseHistory,
-        ViewPurchaseHistoryByStore,
         ChooseStore,
         ViewProducts,
         ProductAmount,
-        Checkout
+        Checkout,
+        //implemented ^
+        ViewPurchaseHistory,
+        ViewPurchaseHistoryByStore,
+        
     }
 }
