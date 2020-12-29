@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace StoreApplication.Models
@@ -7,5 +8,7 @@ namespace StoreApplication.Models
         [Key]
         public int LocationId{get;set;}
         public string Name {get;set;}
+
+        public List<Inventory> InventoryItems {get;set;}
     }
 }

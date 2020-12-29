@@ -3,17 +3,15 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using StoreApplication.Repository;
+using StoreApplication.Logic;
 
 namespace StoreApplication.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20201227202350_initmigration")]
-    partial class initmigration
+    partial class StoreDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,19 +96,36 @@ namespace StoreApplication.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("StoreApplication.Models.OrderLine", b =>
+                {
+                    b.Property<int>("OrderLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
                     b.Property<int?>("InventoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("OrderId");
-
-                    b.HasIndex("CustomerId");
+                    b.HasKey("OrderLineId");
 
                     b.HasIndex("InventoryId");
 
-                    b.ToTable("Orders");
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderLine");
                 });
 
             modelBuilder.Entity("StoreApplication.Models.Product", b =>
@@ -119,6 +134,9 @@ namespace StoreApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
@@ -134,7 +152,7 @@ namespace StoreApplication.Migrations
             modelBuilder.Entity("StoreApplication.Models.Inventory", b =>
                 {
                     b.HasOne("StoreApplication.Models.Location", "Location")
-                        .WithMany()
+                        .WithMany("InventoryItems")
                         .HasForeignKey("LocationId");
 
                     b.HasOne("StoreApplication.Models.Product", "Product")
@@ -149,16 +167,40 @@ namespace StoreApplication.Migrations
             modelBuilder.Entity("StoreApplication.Models.Order", b =>
                 {
                     b.HasOne("StoreApplication.Models.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("CustomerId");
 
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("StoreApplication.Models.OrderLine", b =>
+                {
                     b.HasOne("StoreApplication.Models.Inventory", "Inventory")
                         .WithMany()
                         .HasForeignKey("InventoryId");
 
-                    b.Navigation("Customer");
+                    b.HasOne("StoreApplication.Models.Order", "Order")
+                        .WithMany("Lines")
+                        .HasForeignKey("OrderId");
 
                     b.Navigation("Inventory");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("StoreApplication.Models.Customer", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("StoreApplication.Models.Location", b =>
+                {
+                    b.Navigation("InventoryItems");
+                });
+
+            modelBuilder.Entity("StoreApplication.Models.Order", b =>
+                {
+                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }

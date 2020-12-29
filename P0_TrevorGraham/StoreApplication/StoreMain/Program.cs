@@ -10,6 +10,7 @@ namespace StoreApplication
         {
             StoreCLI ui = new StoreCLI();
             ui.Start();
+            
         }
 
     }

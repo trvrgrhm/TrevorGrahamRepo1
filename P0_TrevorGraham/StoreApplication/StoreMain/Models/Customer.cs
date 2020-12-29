@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace StoreApplication.Models
@@ -10,5 +11,7 @@ namespace StoreApplication.Models
         public string Password{get;set;}
         public string Fname{get;set;}
         public string LName{get;set;}
+
+        public List<Order> Orders {get;set;}
     }
 }

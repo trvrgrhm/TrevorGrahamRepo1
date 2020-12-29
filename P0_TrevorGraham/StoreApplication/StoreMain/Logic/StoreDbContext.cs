@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StoreApplication.Models;
 
-namespace StoreApplication.Repository
+namespace StoreApplication.Logic
 {
     public class StoreDbContext : DbContext
     {

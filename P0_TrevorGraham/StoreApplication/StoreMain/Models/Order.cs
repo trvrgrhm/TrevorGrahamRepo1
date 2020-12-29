@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace StoreApplication.Models
@@ -7,13 +8,11 @@ namespace StoreApplication.Models
     {
         [Key]
         public int OrderId{get;set;}
-        public int Quantity {get;set;}
         public DateTime Date{get;set;}
+
+        public List<OrderLine> Lines{get;set;}
 
         //FK
         public Customer Customer {get;set;}
-        public Inventory Inventory {get;set;}
-
-        
     }
 }
