@@ -10,7 +10,7 @@ using StoreApplication.Logic;
 namespace StoreApplication.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20201230090037_initmigration")]
+    [Migration("20201230095235_initmigration")]
     partial class initmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -115,7 +115,7 @@ namespace StoreApplication.Migrations
                     b.Property<int?>("InventoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderRefId")
+                    b.Property<int?>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -125,7 +125,7 @@ namespace StoreApplication.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.HasIndex("OrderRefId");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderLines");
                 });
@@ -154,7 +154,7 @@ namespace StoreApplication.Migrations
             modelBuilder.Entity("StoreApplication.Models.Inventory", b =>
                 {
                     b.HasOne("StoreApplication.Models.Location", "Location")
-                        .WithMany("Inventorys")
+                        .WithMany("Inventories")
                         .HasForeignKey("LocationId");
 
                     b.HasOne("StoreApplication.Models.Product", "Product")
@@ -183,7 +183,7 @@ namespace StoreApplication.Migrations
 
                     b.HasOne("StoreApplication.Models.Order", "Order")
                         .WithMany("OrderLines")
-                        .HasForeignKey("OrderRefId");
+                        .HasForeignKey("OrderId");
 
                     b.Navigation("Inventory");
 
@@ -197,7 +197,7 @@ namespace StoreApplication.Migrations
 
             modelBuilder.Entity("StoreApplication.Models.Location", b =>
                 {
-                    b.Navigation("Inventorys");
+                    b.Navigation("Inventories");
                 });
 
             modelBuilder.Entity("StoreApplication.Models.Order", b =>

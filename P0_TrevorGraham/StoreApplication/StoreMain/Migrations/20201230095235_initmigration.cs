@@ -105,7 +105,7 @@ namespace StoreApplication.Migrations
                     OrderLineId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    OrderRefId = table.Column<int>(type: "int", nullable: true),
+                    OrderId = table.Column<int>(type: "int", nullable: true),
                     InventoryId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -118,8 +118,8 @@ namespace StoreApplication.Migrations
                         principalColumn: "InventoryId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_OrderLines_Orders_OrderRefId",
-                        column: x => x.OrderRefId,
+                        name: "FK_OrderLines_Orders_OrderId",
+                        column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "OrderId",
                         onDelete: ReferentialAction.Restrict);
@@ -141,9 +141,9 @@ namespace StoreApplication.Migrations
                 column: "InventoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderLines_OrderRefId",
+                name: "IX_OrderLines_OrderId",
                 table: "OrderLines",
-                column: "OrderRefId");
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_CustomerId",

@@ -165,7 +165,8 @@ namespace StoreApplication.UI
                     break;
                     case 1:currentMenu = Menu.Main;
                     break; 
-                    case 2: currentMenu = Menu.ViewPurchaseHistory;
+                    case 2: PurchaseHistoryByStore(session.GetCurrentStoreName());
+                    currentMenu = Menu.Main;
                     break;
                     case 3: currentMenu = Menu.Checkout;
                     break;
@@ -328,6 +329,7 @@ namespace StoreApplication.UI
                 break; 
                 case 2:if(session.AttemptCheckout()){
                     Console.WriteLine($"Checkout successful! for a total of ${session.CartTotal()}, you purchased:\n");
+                    
                     session.RemoveAllItemsFromCart();
                     
                         currentMenu = Menu.Welcome;
@@ -348,7 +350,9 @@ namespace StoreApplication.UI
                 // PurchaseHistoryByStore(session.GetCurrentStoreName());
                 foreach(int orderId in session.GetOrderIds(session.GetCustomerUsername())){
                 OrderDisplay(orderId);
-            }
+                }
+                currentMenu = Menu.Main;
+                return;
                 // session.GetOrderIds(session.GetCustomerUsername());
             }
             else{
@@ -358,14 +362,14 @@ namespace StoreApplication.UI
             }
         }
         void PurchaseHistoryByStore(string storeName){
+
             Console.WriteLine($"Orders from {storeName}");
             foreach(int orderId in session.GetOrderIds(session.GetCustomerUsername(),storeName)){
                 OrderDisplay(orderId);
             }
         }
         void OrderDisplay(int orderId){
-            session.GetOrderLocation(orderId);
-            session.OrderTotal(orderId);
+            Console.WriteLine($"Order from {session.GetOrderLocation(orderId)} for ${session.OrderTotal(orderId)}");
             OrderLineDisplay(orderId);
             currentMenu = Menu.Main;
         }
