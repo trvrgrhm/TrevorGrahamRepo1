@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StoreApplication.Models
 {
@@ -10,7 +11,9 @@ namespace StoreApplication.Models
         public int OrderId{get;set;}
         public DateTime Date{get;set;}
 
-        public List<OrderLine> Lines{get;set;}
+
+        [ForeignKey("OrderRefId")]
+        public List<OrderLine> OrderLines{get;set;}
 
         //FK
         public Customer Customer {get;set;}

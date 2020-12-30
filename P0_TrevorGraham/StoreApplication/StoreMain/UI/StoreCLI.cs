@@ -14,11 +14,16 @@ namespace StoreApplication.UI
         // Location currentLocation = null;
         // List<OrderLine> cart = new List<OrderLine>();
         //state
-        StoreSession session = new StoreSession();
+        StoreSession session;// = new StoreSession();
         Menu currentMenu = Menu.Welcome;
+
+        public StoreCLI(){
+            session = new StoreSession();
+            session.PopulateDb();
+
+        }
         public void Start(){
             //make sure usable data exists
-            session.PopulateDb();
             //start program loop
             while(true){
                 switch(currentMenu){
@@ -339,8 +344,12 @@ namespace StoreApplication.UI
         }
 
         void PurchaseHistory(){
-            if(session.StoreIsChosen()){
-                PurchaseHistoryByStore(session.GetCurrentStoreName());
+            if(session.IsLoggedIn()){
+                // PurchaseHistoryByStore(session.GetCurrentStoreName());
+                foreach(int orderId in session.GetOrderIds(session.GetCustomerUsername())){
+                OrderDisplay(orderId);
+            }
+                // session.GetOrderIds(session.GetCustomerUsername());
             }
             else{
                 Console.WriteLine("Something must have gone wrong, returning to first menu...");
@@ -358,6 +367,7 @@ namespace StoreApplication.UI
             session.GetOrderLocation(orderId);
             session.OrderTotal(orderId);
             OrderLineDisplay(orderId);
+            currentMenu = Menu.Main;
         }
         void OrderLineDisplay(int orderId){
             foreach(string line in session.GetOrderLines(orderId)){

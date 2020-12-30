@@ -12,7 +12,10 @@ namespace StoreApplication.Logic
         /// Provides access to the db; remember to save changes if you make any!
         /// </summary>
         /// <returns></returns>
-        StoreDbContext db = new StoreDbContext();
+        StoreDbContext db;// = new StoreDbContext();
+        public StoreSession(){
+            db = new StoreDbContext();
+        }
 
         #region session variables
         /// <summary>
@@ -47,7 +50,7 @@ namespace StoreApplication.Logic
             return currentLocation != null;
         }
         public bool AttemptChooseProduct(string productName){
-            currentProduct = currentLocation.InventoryItems.SingleOrDefault(x => x.Product.ProductName == productName); 
+            currentProduct = currentLocation.Inventorys.SingleOrDefault(x => x.Product.ProductName == productName); 
             return currentProduct!=null;
         }
 
@@ -88,7 +91,7 @@ namespace StoreApplication.Logic
                 Order newOrder = new Order(){
                     Date = DateTime.Now,
                     Customer = currentCustomer,
-                    Lines = cart
+                    OrderLines = cart
                 };
                 db.Orders.Add(newOrder);
                 db.SaveChanges();
@@ -102,18 +105,10 @@ namespace StoreApplication.Logic
         public double OrderTotal(int orderId){
             Order order = db.Orders.SingleOrDefault(x=>x.OrderId==orderId);
             if(order!=null)
-            return order.Lines.Select(x=>x.Inventory.Product.Price).Sum();
+            return order.OrderLines.Select(x=>x.Inventory.Product.Price).Sum();
             return 0.0;
         }
-        public List<int> GetOrderIds(string customerName, string location){
-            List<int> orderIds = new List<int>();
-            foreach(Order order in db.Orders){
-                if(order.Customer.Username == customerName && order.Lines[0].Inventory.Location.Name == location){
-                    orderIds.Add(order.OrderId);
-                }
-            }
-            return orderIds;
-        }
+        
 
         public bool RemoveAllItemsFromCart(){
             cart = null;
@@ -139,13 +134,15 @@ namespace StoreApplication.Logic
                 }
             }
             //restock stores
+            if(db.Inventories.Count()<1){
             foreach(Location store in db.Locations.ToList()){
-                 if(store.InventoryItems.Count()<1){
+                //  if( db.Inventories.Select(x=>x.Location.Equals(store)).Count()<1){// Store.Inventorys.Count()<1){
                     foreach(Product product in db.Products.ToList()){
                         AddInventoryItem(store,product,10);
                     }
-                 }
+                //  }
             }
+        }
         }
 
         public bool AddInventoryItem(Location store,Product product,int amount){
@@ -251,6 +248,8 @@ namespace StoreApplication.Logic
         /// </summary>
         /// <returns></returns>
         public bool CartIsEmpty(){
+            if(cart==null)
+            return false;
             return !cart.Any();
         }
         public string GetCustomerUsername(){
@@ -313,7 +312,7 @@ namespace StoreApplication.Logic
         /// <returns></returns>
         public List<string> GetCurrentProductNames(){
             List<string> products = new List<string>();
-            foreach(Inventory inventory in currentLocation.InventoryItems){
+            foreach(Inventory inventory in db.Inventories.Where(x=>x.Location==currentLocation)){
                 products.Add(inventory.Product.ProductName);
             }
             return products;
@@ -325,7 +324,7 @@ namespace StoreApplication.Logic
         /// <returns></returns>
         public string GetProductPrice(string prductName){
             if(StoreIsChosen()){
-                return currentLocation.InventoryItems.SingleOrDefault(x => x.Product.ProductName ==prductName).Product.Price.ToString();
+                return currentLocation.Inventorys.SingleOrDefault(x => x.Product.ProductName ==prductName).Product.Price.ToString();
             }
             return "not in inventory";
         }
@@ -336,7 +335,7 @@ namespace StoreApplication.Logic
         /// <returns></returns>
         public int GetProductQuantity(string prductName){
             if(StoreIsChosen()){
-                return currentLocation.InventoryItems.SingleOrDefault(x => x.Product.ProductName ==prductName).Quantity;
+                return currentLocation.Inventorys.SingleOrDefault(x => x.Product.ProductName ==prductName).Quantity;
             }
             return -1;
         }
@@ -347,17 +346,34 @@ namespace StoreApplication.Logic
         /// <returns></returns>
         public List<string> GetCurrentInventory(){
             List<string> products = new List<string>();
-            foreach(Inventory inventory in currentLocation.InventoryItems){
+            foreach(Inventory inventory in currentLocation.Inventorys){
                 products.Add($"\n{inventory.Product.ProductName}\nPrice: ${inventory.Product.Price}\n{inventory.Quantity} left in stock\n");
             }
             return products;
         }
         //order info
+        public List<int> GetOrderIds(string customerName, string location){
+            List<int> orderIds = new List<int>();
+            foreach(Order order in db.Orders.ToList()){
+                if(order.Customer.Username == customerName && db.OrderLines.FirstOrDefault(x=>x.Order==order).Inventory.Location.Name == location){
+                    orderIds.Add(order.OrderId);
+                }
+            }
+            return orderIds;
+        }
+        public List<int> GetOrderIds(string customerName){
+            return db.Orders.Where(x=>x.Customer.Username==customerName).Select(x=>x.OrderId).ToList();
+        }
+        public List<int> GetOrderIds(){
+            return db.Orders.Select(x=>x.OrderId).ToList();
+        }
         public string GetOrderLocation(int orderId){
-            return db.Orders.SingleOrDefault(x=>x.OrderId ==orderId).Lines[0].Inventory.Location.Name;
+            
+            return db.OrderLines.FirstOrDefault(x=>x.Order.OrderId==orderId).Inventory.Location.Name;
+            // return db.Orders.SingleOrDefault(x=>x.OrderId == orderId).OrderLines[0].Inventory.Location.Name;
         }
         public List<string> GetOrderLines(int orderId){
-            return db.Orders.SingleOrDefault(x=>x.OrderId ==orderId).Lines.Select(x=>$"{x.Quantity} {x.Inventory.Product}s: ${x.Inventory.Product.Price}").ToList();
+            return db.Orders.SingleOrDefault(x=>x.OrderId ==orderId).OrderLines.Select(x=>$"{x.Quantity} {x.Inventory.Product}s: ${x.Inventory.Product.Price}").ToList();
         }
         #endregion
     }

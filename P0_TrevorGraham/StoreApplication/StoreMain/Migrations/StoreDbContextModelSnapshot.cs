@@ -113,7 +113,7 @@ namespace StoreApplication.Migrations
                     b.Property<int?>("InventoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderId")
+                    b.Property<int?>("OrderRefId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -123,9 +123,9 @@ namespace StoreApplication.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderRefId");
 
-                    b.ToTable("OrderLine");
+                    b.ToTable("OrderLines");
                 });
 
             modelBuilder.Entity("StoreApplication.Models.Product", b =>
@@ -152,7 +152,7 @@ namespace StoreApplication.Migrations
             modelBuilder.Entity("StoreApplication.Models.Inventory", b =>
                 {
                     b.HasOne("StoreApplication.Models.Location", "Location")
-                        .WithMany("InventoryItems")
+                        .WithMany("Inventorys")
                         .HasForeignKey("LocationId");
 
                     b.HasOne("StoreApplication.Models.Product", "Product")
@@ -180,8 +180,8 @@ namespace StoreApplication.Migrations
                         .HasForeignKey("InventoryId");
 
                     b.HasOne("StoreApplication.Models.Order", "Order")
-                        .WithMany("Lines")
-                        .HasForeignKey("OrderId");
+                        .WithMany("OrderLines")
+                        .HasForeignKey("OrderRefId");
 
                     b.Navigation("Inventory");
 
@@ -195,12 +195,12 @@ namespace StoreApplication.Migrations
 
             modelBuilder.Entity("StoreApplication.Models.Location", b =>
                 {
-                    b.Navigation("InventoryItems");
+                    b.Navigation("Inventorys");
                 });
 
             modelBuilder.Entity("StoreApplication.Models.Order", b =>
                 {
-                    b.Navigation("Lines");
+                    b.Navigation("OrderLines");
                 });
 #pragma warning restore 612, 618
         }
