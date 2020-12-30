@@ -10,8 +10,8 @@ using StoreApplication.Logic;
 namespace StoreApplication.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20201229035950_migration3")]
-    partial class migration3
+    [Migration("20201230103754_migration2")]
+    partial class migration2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -127,7 +127,7 @@ namespace StoreApplication.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderLine");
+                    b.ToTable("OrderLines");
                 });
 
             modelBuilder.Entity("StoreApplication.Models.Product", b =>
@@ -182,7 +182,7 @@ namespace StoreApplication.Migrations
                         .HasForeignKey("InventoryId");
 
                     b.HasOne("StoreApplication.Models.Order", "Order")
-                        .WithMany("Lines")
+                        .WithMany("OrderLines")
                         .HasForeignKey("OrderId");
 
                     b.Navigation("Inventory");
@@ -202,7 +202,7 @@ namespace StoreApplication.Migrations
 
             modelBuilder.Entity("StoreApplication.Models.Order", b =>
                 {
-                    b.Navigation("Lines");
+                    b.Navigation("OrderLines");
                 });
 #pragma warning restore 612, 618
         }

@@ -14,11 +14,16 @@ namespace StoreApplication.UI
         // Location currentLocation = null;
         // List<OrderLine> cart = new List<OrderLine>();
         //state
-        StoreSession session = new StoreSession();
+        StoreSession session;// = new StoreSession();
         Menu currentMenu = Menu.Welcome;
+
+        public StoreCLI(){
+            session = new StoreSession();
+            session.PopulateDb();
+
+        }
         public void Start(){
             //make sure usable data exists
-            session.PopulateDb();
             //start program loop
             while(true){
                 switch(currentMenu){
@@ -38,10 +43,10 @@ namespace StoreApplication.UI
                     break;
                     case Menu.Main: MainMenu();
                     break;
-                    case Menu.ViewPurchaseHistory:
+                    case Menu.ViewPurchaseHistory: PurchaseHistory();
                     break;
-                    case Menu.ViewPurchaseHistoryByStore:
-                    break;
+                    // case Menu.ViewPurchaseHistoryByStore:
+                    // break;
                 }
             }
         }
@@ -70,9 +75,7 @@ namespace StoreApplication.UI
                 //successfully logged in
                 Console.WriteLine($"\nWelcome {session.GetCustomerFname()}!\n");
                 //
-                if(session.CartIsEmpty()){
-                    Console.WriteLine("You don't have anything in your cart.");
-                }
+                CartDisplay();
 
                 string makeChoice = ("\nWhat would you like to do?\n");
                 string[] options = {"Choose a Store to Shop at","Checkout with Current Cart","View Purchase History","Logout","Exit"};
@@ -149,6 +152,7 @@ namespace StoreApplication.UI
                 List<string> options = new List<string>();
                 options.Add("Exit");
                 options.Add("Go Back to Main Menu");
+                options.Add("View Order History");
                 options.Add("Checkout");
                 string[] products = session.GetCurrentProductNames().ToArray();
                 foreach(string product in products){
@@ -161,10 +165,13 @@ namespace StoreApplication.UI
                     break;
                     case 1:currentMenu = Menu.Main;
                     break; 
-                    case 2: currentMenu = Menu.Checkout;
+                    case 2: PurchaseHistoryByStore(session.GetCurrentStoreName());
+                    currentMenu = Menu.Main;
+                    break;
+                    case 3: currentMenu = Menu.Checkout;
                     break;
                     default: //attempt to choose store;if successful, go to products menu
-                        if(session.AttemptChooseProduct(products[choice-3])){currentMenu = Menu.ProductAmount;}
+                        if(session.AttemptChooseProduct(products[choice-4])){currentMenu = Menu.ProductAmount;}
                     break;
                 }
             }
@@ -322,6 +329,7 @@ namespace StoreApplication.UI
                 break; 
                 case 2:if(session.AttemptCheckout()){
                     Console.WriteLine($"Checkout successful! for a total of ${session.CartTotal()}, you purchased:\n");
+                    
                     session.RemoveAllItemsFromCart();
                     
                         currentMenu = Menu.Welcome;
@@ -338,8 +346,14 @@ namespace StoreApplication.UI
         }
 
         void PurchaseHistory(){
-            if(session.StoreIsChosen()){
-                PurchaseHistoryByStore(session.GetCurrentStoreName());
+            if(session.IsLoggedIn()){
+                // PurchaseHistoryByStore(session.GetCurrentStoreName());
+                foreach(int orderId in session.GetOrderIds(session.GetCustomerUsername())){
+                OrderDisplay(orderId);
+                }
+                currentMenu = Menu.Main;
+                return;
+                // session.GetOrderIds(session.GetCustomerUsername());
             }
             else{
                 Console.WriteLine("Something must have gone wrong, returning to first menu...");
@@ -348,12 +362,21 @@ namespace StoreApplication.UI
             }
         }
         void PurchaseHistoryByStore(string storeName){
-            
+
+            Console.WriteLine($"Orders from {storeName}");
+            foreach(int orderId in session.GetOrderIds(session.GetCustomerUsername(),storeName)){
+                OrderDisplay(orderId);
+            }
         }
-        void OrderDisplay(string orderId){
-            //display location
-            //display total price
-            //display 
+        void OrderDisplay(int orderId){
+            Console.WriteLine($"Order from {session.GetOrderLocation(orderId)} for ${session.OrderTotal(orderId)}");
+            OrderLineDisplay(orderId);
+            currentMenu = Menu.Main;
+        }
+        void OrderLineDisplay(int orderId){
+            foreach(string line in session.GetOrderLines(orderId)){
+                Console.WriteLine(line);
+            }
         }
         void CartDisplay(){
             Console.WriteLine();

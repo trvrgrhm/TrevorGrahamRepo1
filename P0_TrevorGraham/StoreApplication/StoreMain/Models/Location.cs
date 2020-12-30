@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+// using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StoreApplication.Models
 {
@@ -9,6 +10,7 @@ namespace StoreApplication.Models
         public int LocationId{get;set;}
         public string Name {get;set;}
 
-        public List<Inventory> InventoryItems {get;set;} = new List<Inventory>();
+        // [ForeignKey("LocationId")]
+        public List<Inventory> InventoryItems {get;set;} //= new List<Inventory>();
     }
 }
