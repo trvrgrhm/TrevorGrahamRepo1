@@ -113,7 +113,6 @@ namespace StoreApplication.Logic
                 }
             }
             return orderIds;
-
         }
 
         public bool RemoveAllItemsFromCart(){
@@ -254,6 +253,12 @@ namespace StoreApplication.Logic
         public bool CartIsEmpty(){
             return !cart.Any();
         }
+        public string GetCustomerUsername(){
+            if(IsLoggedIn()){
+                return currentCustomer.Username;
+            }
+            else{return null;}
+        }
         /// <summary>
         /// Returns current customer's first name if a user is logged in and null if no user is logged in.
         /// </summary>
@@ -346,6 +351,13 @@ namespace StoreApplication.Logic
                 products.Add($"\n{inventory.Product.ProductName}\nPrice: ${inventory.Product.Price}\n{inventory.Quantity} left in stock\n");
             }
             return products;
+        }
+        //order info
+        public string GetOrderLocation(int orderId){
+            return db.Orders.SingleOrDefault(x=>x.OrderId ==orderId).Lines[0].Inventory.Location.Name;
+        }
+        public List<string> GetOrderLines(int orderId){
+            return db.Orders.SingleOrDefault(x=>x.OrderId ==orderId).Lines.Select(x=>$"{x.Quantity} {x.Inventory.Product}s: ${x.Inventory.Product.Price}").ToList();
         }
         #endregion
     }

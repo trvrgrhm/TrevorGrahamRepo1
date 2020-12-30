@@ -38,10 +38,10 @@ namespace StoreApplication.UI
                     break;
                     case Menu.Main: MainMenu();
                     break;
-                    case Menu.ViewPurchaseHistory:
+                    case Menu.ViewPurchaseHistory: PurchaseHistory();
                     break;
-                    case Menu.ViewPurchaseHistoryByStore:
-                    break;
+                    // case Menu.ViewPurchaseHistoryByStore:
+                    // break;
                 }
             }
         }
@@ -70,9 +70,7 @@ namespace StoreApplication.UI
                 //successfully logged in
                 Console.WriteLine($"\nWelcome {session.GetCustomerFname()}!\n");
                 //
-                if(session.CartIsEmpty()){
-                    Console.WriteLine("You don't have anything in your cart.");
-                }
+                CartDisplay();
 
                 string makeChoice = ("\nWhat would you like to do?\n");
                 string[] options = {"Choose a Store to Shop at","Checkout with Current Cart","View Purchase History","Logout","Exit"};
@@ -149,6 +147,7 @@ namespace StoreApplication.UI
                 List<string> options = new List<string>();
                 options.Add("Exit");
                 options.Add("Go Back to Main Menu");
+                options.Add("View Order History");
                 options.Add("Checkout");
                 string[] products = session.GetCurrentProductNames().ToArray();
                 foreach(string product in products){
@@ -161,10 +160,12 @@ namespace StoreApplication.UI
                     break;
                     case 1:currentMenu = Menu.Main;
                     break; 
-                    case 2: currentMenu = Menu.Checkout;
+                    case 2: currentMenu = Menu.ViewPurchaseHistory;
+                    break;
+                    case 3: currentMenu = Menu.Checkout;
                     break;
                     default: //attempt to choose store;if successful, go to products menu
-                        if(session.AttemptChooseProduct(products[choice-3])){currentMenu = Menu.ProductAmount;}
+                        if(session.AttemptChooseProduct(products[choice-4])){currentMenu = Menu.ProductAmount;}
                     break;
                 }
             }
@@ -348,12 +349,20 @@ namespace StoreApplication.UI
             }
         }
         void PurchaseHistoryByStore(string storeName){
-            
+            Console.WriteLine($"Orders from {storeName}");
+            foreach(int orderId in session.GetOrderIds(session.GetCustomerUsername(),storeName)){
+                OrderDisplay(orderId);
+            }
         }
-        void OrderDisplay(string orderId){
-            //display location
-            //display total price
-            //display 
+        void OrderDisplay(int orderId){
+            session.GetOrderLocation(orderId);
+            session.OrderTotal(orderId);
+            OrderLineDisplay(orderId);
+        }
+        void OrderLineDisplay(int orderId){
+            foreach(string line in session.GetOrderLines(orderId)){
+                Console.WriteLine(line);
+            }
         }
         void CartDisplay(){
             Console.WriteLine();
