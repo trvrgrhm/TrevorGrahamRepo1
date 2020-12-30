@@ -30,14 +30,24 @@ namespace StoreApplication.UI
                     break;
                     case Menu.ChooseStore: ChooseStore();
                     break;
+                    case Menu.ViewProducts: ViewProducts();
+                    break;
+                    case Menu.ProductAmount: ProductAmount();
+                    break;
+                    case Menu.Checkout: CheckoutMenu();
+                    break;
                     case Menu.Main: MainMenu();
+                    break;
+                    case Menu.ViewPurchaseHistory:
+                    break;
+                    case Menu.ViewPurchaseHistoryByStore:
                     break;
                 }
             }
         }
         #region menus
         void WelcomeMenu(){
-            Console.WriteLine("Welcome to the Store Application!");
+            Console.WriteLine("\nWelcome to the Store Application!\n");
             string[] startOptions = {"Log In","Register New User","Exit"};
             switch(ChooseOptionFromList(options:startOptions)){
                 case 0: currentMenu = Menu.SignIn;
@@ -94,9 +104,7 @@ namespace StoreApplication.UI
                 //successfully logged in
                 Console.WriteLine($"\nWelcome {session.GetCustomerFname()}!\n");
                 //
-                if(session.CartIsEmpty()){
-                    Console.WriteLine("You don't have anything in your cart.");
-                }
+                CartDisplay();
 
                 string makeChoice = ("\nWhat would you like to do?\n");
                 List<string> options = new List<string>();
@@ -122,7 +130,77 @@ namespace StoreApplication.UI
 
         }
         void ViewProducts(){
+            //check if user is signed in?
+            if(!session.IsLoggedIn()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+            if(!session.StoreIsChosen()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+            else{
+                //successfully logged in
+                Console.WriteLine($"\n{session.GetCustomerFname()}, welcome to the {session.GetCurrentStoreName()} store!\n");
+                CartDisplay();
+                string makeChoice = ("\nWhat would you like to do?\n");
+                List<string> options = new List<string>();
+                options.Add("Exit");
+                options.Add("Go Back to Main Menu");
+                options.Add("Checkout");
+                string[] products = session.GetCurrentProductNames().ToArray();
+                foreach(string product in products){
+                    options.Add($"Add {product} to Cart\n{product} costs ${session.GetProductPrice(product)}");
+                }
+                int choice = ChooseOptionFromList(intro: makeChoice, options:options.ToArray());
+                switch(choice){
+                    //if sign-in is successful, move to main menu, otherwise, stay in sign in menu
+                    case 0:Environment.Exit(0);
+                    break;
+                    case 1:currentMenu = Menu.Main;
+                    break; 
+                    case 2: currentMenu = Menu.Checkout;
+                    break;
+                    default: //attempt to choose store;if successful, go to products menu
+                        if(session.AttemptChooseProduct(products[choice-3])){currentMenu = Menu.ProductAmount;}
+                    break;
+                }
+            }
 
+        }
+        void ProductAmount(){
+            //check if user is signed in?
+            if(!session.IsLoggedIn()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+            if(!session.StoreIsChosen()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+            if(!session.ProductIsChosen()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+            string currentProduct = session.GetCurrentProduct();
+            Console.WriteLine($"{currentProduct} was selected.\nThere are {session.GetProductQuantity(currentProduct)} in stock.");
+            Console.WriteLine("How many would you like to buy?");
+            int desiredAmount = 0;
+            if(IsValidNumberOption(Console.ReadLine(),session.GetProductQuantity(currentProduct),out desiredAmount)){
+                if(session.AttemptAddToCart(desiredAmount)){
+                    Console.WriteLine($"You have successfully added {desiredAmount} {currentProduct}s to your cart.");
+                    currentMenu = Menu.ViewProducts;
+                    return;
+                }
+            }
+            Console.WriteLine("Something must have gone wrong, returning to first menu...");
+            currentMenu = Menu.Welcome;
+            return;
         }
         void SignInMenu(){
             Console.Write("Please enter your username: ");
@@ -209,6 +287,84 @@ namespace StoreApplication.UI
             }
         }
 
+        void CheckoutMenu(){
+            //check if user is signed in?
+            if(!session.IsLoggedIn()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+            if(!session.StoreIsChosen()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+            if(!session.ProductIsChosen()){
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+            CartDisplay();
+
+            string checkoutIntro = ("\nWould you like to check out now?\n");
+            string[] checkoutOptions = {"Add More Items to Chart","Empty Cart and Return To First Menu","Checkout","Exit"};
+            switch(ChooseOptionFromList(intro: checkoutIntro, options:checkoutOptions)){
+                //if sign-in is successful, move to main menu, otherwise, stay in sign in menu
+                case 0: currentMenu = Menu.ViewProducts;
+                break;//stays in current menu
+                case 1: if(session.RemoveAllItemsFromCart()){
+                    currentMenu = Menu.Main;}
+                    else{
+                        Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                        currentMenu = Menu.Welcome;
+                return;
+                    }
+                break; 
+                case 2:if(session.AttemptCheckout()){
+                    Console.WriteLine($"Checkout successful! for a total of ${session.CartTotal()}, you purchased:\n");
+                    session.RemoveAllItemsFromCart();
+                    
+                        currentMenu = Menu.Welcome;
+                                    
+                }
+                else{Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;}
+                break;
+                case 3: Environment.Exit(0);
+                break;
+            }
+
+        }
+
+        void PurchaseHistory(){
+            if(session.StoreIsChosen()){
+                PurchaseHistoryByStore(session.GetCurrentStoreName());
+            }
+            else{
+                Console.WriteLine("Something must have gone wrong, returning to first menu...");
+                currentMenu = Menu.Welcome;
+                return;
+            }
+        }
+        void PurchaseHistoryByStore(string storeName){
+            
+        }
+        void OrderDisplay(string orderId){
+            //display location
+            //display total price
+            //display 
+        }
+        void CartDisplay(){
+            Console.WriteLine();
+            if(session.CartIsEmpty()){
+                Console.WriteLine("You don't have anything in your cart.");
+            }
+            else{
+                Console.WriteLine("You have stuff in your cart");
+            }
+            Console.WriteLine();
+        }
         #endregion
         #region choosing options
         /// <summary>
@@ -225,7 +381,7 @@ namespace StoreApplication.UI
             while(!validChoice){
                 Console.WriteLine(intro);
                 for(int i =0;i<options.Length;i++){
-                    Console.WriteLine(i+". "+options[i]);
+                    Console.WriteLine(i+". "+options[i]+"\n");
                 }
                 Console.WriteLine("Select an option by typing in the number next to the desired option.");
                 validChoice = IsValidNumberOption(Console.ReadLine(),options.Length, out userChoice);

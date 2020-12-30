@@ -9,6 +9,6 @@ namespace StoreApplication.Models
         public int LocationId{get;set;}
         public string Name {get;set;}
 
-        public List<Inventory> InventoryItems {get;set;}
+        public List<Inventory> InventoryItems {get;set;} = new List<Inventory>();
     }
 }
