@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcStoreApplication", "MvcStoreApplication\MvcStoreApplication.csproj", "{CCF94A50-12F9-4202-8D98-5F68BFCD291A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{75A89B2E-0E6C-4F50-8F41-847589B00FBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{75A89B2E-0E6C-4F50-8F41-847589B00FBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{73E46408-96D8-4BEA-B02F-2829312CA69B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogicLayer", "BusinessLogic\BusinessLogicLayer.csproj", "{73E46408-96D8-4BEA-B02F-2829312CA69B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{6AA2864A-F49B-47BD-AEDC-E116DFCF5801}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepositoryLayer", "Repository\RepositoryLayer.csproj", "{6AA2864A-F49B-47BD-AEDC-E116DFCF5801}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

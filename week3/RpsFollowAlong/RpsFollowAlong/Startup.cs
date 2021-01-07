@@ -29,7 +29,7 @@ namespace RpsFollowAlong
             services.AddScoped<RpsDbContext>();
             services.AddScoped<Repository>();
             services.AddScoped<BusinessLogic>();
-            services.AddScoped<Mapper>();
+            //services.AddScoped<Mapper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
