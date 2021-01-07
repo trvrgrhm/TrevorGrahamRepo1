@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RepositoryLayer
 {
-    class RpsDbContext : DbContext
+    public class RpsDbContext : DbContext
     {
         public DbSet<Player> players { get; set; }
         public DbSet<Round> rounds { get; set; }

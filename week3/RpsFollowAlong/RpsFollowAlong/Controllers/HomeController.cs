@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BusinessLogicLayer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RpsFollowAlong.Models;
 using System;
@@ -12,10 +13,12 @@ namespace RpsFollowAlong.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly BusinessLogic _businessLogic;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,BusinessLogic businessLogic)
         {
             _logger = logger;
+            _businessLogic = businessLogic;
         }
 
         public IActionResult Index()
@@ -26,6 +29,11 @@ namespace RpsFollowAlong.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+        public IActionResult ListPlayers()
+        {
+            var players = _businessLogic.GetAllPlayerViewModels();
+            return View(players);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
