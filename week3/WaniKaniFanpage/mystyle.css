@@ -1,0 +1,7 @@
+*{background-color:rgb(184, 165, 223) !important}
+h1,h2,p, .nav-link{
+    color:darkviolet
+}
+.active{
+    background-color: darkviolet;
+}
