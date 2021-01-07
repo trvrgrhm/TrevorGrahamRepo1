@@ -6,14 +6,6 @@ namespace StoreApplication.UI
 {
     public class StoreCLI
     {
-        //db access
-        // StoreDbContext db = new StoreDbContext();
-
-        // //session variables
-        // Customer currentCustomer = null;
-        // Location currentLocation = null;
-        // List<OrderLine> cart = new List<OrderLine>();
-        //state
         StoreSession session;// = new StoreSession();
         Menu currentMenu = Menu.Welcome;
 
@@ -195,7 +187,7 @@ namespace StoreApplication.UI
                 return;
             }
             string currentProduct = session.GetCurrentProduct();
-            Console.WriteLine($"{currentProduct} was selected.\nThere are {session.GetProductQuantity(currentProduct)} in stock.");
+            Console.WriteLine($"{currentProduct} was selected.\nThere are {session.GetProductQuantity(currentProduct)} in stock, and they cost ${session.GetProductPrice(currentProduct)} each.");
             Console.WriteLine("How many would you like to buy?");
             int desiredAmount = 0;
             if(IsValidNumberOption(Console.ReadLine(),session.GetProductQuantity(currentProduct),out desiredAmount)){
@@ -204,6 +196,10 @@ namespace StoreApplication.UI
                     currentMenu = Menu.ViewProducts;
                     return;
                 }
+            }
+            else{
+                Console.WriteLine($"Please choose an amount that {session.GetCurrentStoreName()} can handle.");
+                return;
             }
             Console.WriteLine("Something must have gone wrong, returning to first menu...");
             currentMenu = Menu.Welcome;
@@ -314,7 +310,7 @@ namespace StoreApplication.UI
             CartDisplay();
 
             string checkoutIntro = ("\nWould you like to check out now?\n");
-            string[] checkoutOptions = {"Add More Items to Chart","Empty Cart and Return To First Menu","Checkout","Exit"};
+            string[] checkoutOptions = {"Add More Items to Chart","Empty Cart and Return To First Menu","Confirm Checkout","Exit"};
             switch(ChooseOptionFromList(intro: checkoutIntro, options:checkoutOptions)){
                 //if sign-in is successful, move to main menu, otherwise, stay in sign in menu
                 case 0: currentMenu = Menu.ViewProducts;
@@ -328,7 +324,7 @@ namespace StoreApplication.UI
                     }
                 break; 
                 case 2:if(session.AttemptCheckout()){
-                    Console.WriteLine($"Checkout successful! for a total of ${session.CartTotal()}, you purchased:\n");
+                    Console.WriteLine($"Checkout successful! for a total of ${session.CartTotal()}, you purchased: things; check your order history for now.\n");
                     
                     session.RemoveAllItemsFromCart();
                     
@@ -446,7 +442,6 @@ namespace StoreApplication.UI
         ViewProducts,
         ProductAmount,
         Checkout,
-        //implemented ^
         ViewPurchaseHistory,
         ViewPurchaseHistoryByStore,
         
