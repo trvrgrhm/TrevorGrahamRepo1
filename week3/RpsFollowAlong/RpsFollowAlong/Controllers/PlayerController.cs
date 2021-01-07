@@ -28,9 +28,10 @@ namespace RpsFollowAlong.Controllers
         }
 
         // GET: PlayerController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid playerId)
         {
-            return View();
+
+            return View("DisplayPlayerDetails", _businessLogic.GetPlayerViewById(playerId));
         }
 
         // GET: PlayerController/Create
@@ -55,10 +56,10 @@ namespace RpsFollowAlong.Controllers
         }
 
         // GET: PlayerController/Edit/5
-        [Route("{playerGuid}")]
-        public ActionResult EditPlayer(Guid playerGuid)
+        //[Route("{playerGuid}")]
+        public ActionResult Edit(Guid playerId)
         {
-            PlayerViewModel playerViewModel = _businessLogic.EditPlayer(playerGuid);
+            PlayerViewModel playerViewModel = _businessLogic.GetPlayerViewById(playerId);
             //call a method in BusinessLogic that takes playerId and returns a playerViewModel
             return View(playerViewModel);
         }
@@ -73,40 +74,48 @@ namespace RpsFollowAlong.Controllers
             return View("DisplayPlayerDetails",playerViewModel1);
         }
 
-        // POST: PlayerController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        //// POST: PlayerController/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
 
         // GET: PlayerController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid playerId)
         {
-            return View();
+            return View(_businessLogic.GetPlayerViewById(playerId));
         }
 
         // POST: PlayerController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(Guid playerId, IFormCollection collection)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _businessLogic.DeletePlayer(playerId);
+                return RedirectToAction("ListPlayers");
             }
             catch
             {
                 return View();
             }
+        }
+
+        public IActionResult ListPlayers()
+        {
+            var players = _businessLogic.GetAllPlayerViewModels();
+            //view generated using a list of playerViewModels
+            return View(players);
         }
     }
 }

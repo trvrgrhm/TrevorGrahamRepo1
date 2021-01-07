@@ -41,7 +41,7 @@ namespace BusinessLogicLayer
 
             return playerViewModel;
         }
-        public PlayerViewModel EditPlayer(Guid playerId)
+        public PlayerViewModel GetPlayerViewById(Guid playerId)
         {
             //call method in repository to get player by id
             Player player = _repository.GetPlayerById(playerId);
@@ -71,6 +71,11 @@ namespace BusinessLogicLayer
             PlayerViewModel playerViewModel1 = _mapper.ConvertPlayerToPlayerViewModel(player1);
 
             return playerViewModel1;
+        }
+
+        public bool DeletePlayer(Guid playerId)
+        {
+            return _repository.DeletePlayer(playerId);
         }
 
         /// <summary>

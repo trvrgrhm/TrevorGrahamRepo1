@@ -76,6 +76,27 @@ namespace RepositoryLayer
             return player2;
         }
 
+        /// <summary>
+        /// deletes selected player from the db and returns true if successful
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        public bool DeletePlayer(Guid playerId)
+        {
+
+            Player playerToBeDeleted = GetPlayerById(playerId);
+
+            if (playerToBeDeleted != null)
+            {
+                //if(_dbContext.players.Contains(playerToBeDeleted))
+                _dbContext.players.Remove(playerToBeDeleted);
+                _dbContext.SaveChanges();
+                return true;
+            }
+
+            return false;
+        }
+
         public Player GetPlayerById(Guid playerId)
         {
             Player player = _dbContext.players.FirstOrDefault(x => x.playerId == playerId);

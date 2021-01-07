@@ -6,9 +6,9 @@
 
 <h1>View</h1>
 
-<p>
+@*<p>
     <a asp-action="Create">Create New</a>
-</p>
+</p>*@
 <table class="table">
     <thead>
         <tr>
@@ -52,12 +52,12 @@
                 @Html.DisplayFor(modelItem => item.numLosses)
             </td>
             <td>
-                <img class="img-responsive small-image" src="@item.JpegStringImage" alt="No Image Found"style=" max-height: 100px; width: auto" />
+                <img class="img-responsive small-image" src="@item.JpegStringImage" alt="No Image Found"  style="max-height:100px;width:auto"/>
             </td>
             <td>
-                @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
+                @Html.ActionLink("Edit", "Edit", new { playerId = item.playerId }) |
+                @Html.ActionLink("Details", "Details", new { playerId = item.playerId }) |
+                @Html.ActionLink("Delete", "Delete", new { playerId = item.playerId })
             </td>
         </tr>
 }

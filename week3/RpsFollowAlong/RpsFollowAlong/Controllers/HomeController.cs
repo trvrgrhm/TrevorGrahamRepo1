@@ -30,11 +30,6 @@ namespace RpsFollowAlong.Controllers
         {
             return View();
         }
-        public IActionResult ListPlayers()
-        {
-            var players = _businessLogic.GetAllPlayerViewModels();
-            return View(players);
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
