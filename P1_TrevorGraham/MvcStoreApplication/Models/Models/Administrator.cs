@@ -17,6 +17,7 @@ namespace Models
         [Display(Name = "Username")]
         public string Username { get; set; }
 
+        [DataType(DataType.Password)]
         [StringLength(40, MinimumLength = 5, ErrorMessage = "The password must be between 5 and 40 characters.")]
         [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Use letters and numbers only please")]
         [Display(Name = "Password")]

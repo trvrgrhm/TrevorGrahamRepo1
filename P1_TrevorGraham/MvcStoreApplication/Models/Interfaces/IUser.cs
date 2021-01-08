@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    interface IUser
+    public interface IUser
     {
         [Key]
         public int UserId { get; set; }
