@@ -16,7 +16,11 @@ namespace RepositoryLayer
         }
 
         #region Customers
-
+        /// <summary>
+        /// Attempts to add customer to db and returns whether or not it was successful
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         public bool AttemptAddCustomerToDb(Customer customer)
         {
             //if there is not a product in the db with the same id or name
@@ -33,6 +37,11 @@ namespace RepositoryLayer
             }
             return false;
         }
+        /// <summary>
+        /// checks if the given customer is in the db based on id and username
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         public bool CustomerIsInDb(Customer customer)
         {
             return _dbContext.Customers.ToList().Where(x => x.UserId == customer.UserId||x.Username == customer.Username).Count() > 0;
@@ -41,11 +50,15 @@ namespace RepositoryLayer
         {
             return CustomerIsInDb(GetCustomerById(customerId));
         }
+        /// <summary>
+        /// returns a customer object based on the given customer id
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
         public Customer GetCustomerById(int customerId)
         {
             return _dbContext.Customers.FirstOrDefault(x => x.UserId == customerId);
         }
-
         /// <summary>
         /// returns a list of all of the customers
         /// </summary>
