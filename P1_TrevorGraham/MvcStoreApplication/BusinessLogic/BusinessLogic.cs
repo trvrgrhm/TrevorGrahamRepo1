@@ -61,7 +61,7 @@ namespace BusinessLogicLayer
         }
         public bool SetCurrentLocation(int locationId)
         {
-            if (_repository.DoesLocationExist(locationId))
+            if (_repository.LocationIsInDb(locationId))
             {
                 currentLocationId = locationId;
                 return true;
