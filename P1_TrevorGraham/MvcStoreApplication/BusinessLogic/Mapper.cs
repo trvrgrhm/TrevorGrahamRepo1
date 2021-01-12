@@ -1,5 +1,6 @@
 ﻿using Models;
 using Models.ViewModels;
+using RepositoryLayer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,43 @@ namespace BusinessLogicLayer
 {
     public class Mapper
     {
+        private readonly Repository _repository;
+
+        public Mapper(Repository repository)
+        {
+            _repository = repository;
+        }
+
+        //admin
+        public AdministratorViewModel ConvertAdministratorToAdministratorViewModel(Administrator admin)
+        {
+            AdministratorViewModel adminViewModel = new AdministratorViewModel()
+            {
+                UserId = admin.UserId,
+                Username = admin.Username,
+                Password = admin.Password,
+                Fname = admin.Fname,
+                LName = admin.LName,
+                Acesslevel = admin.Acesslevel
+            };
+            return adminViewModel;
+        }
+        public Administrator ConvertAdministratorViewModelToAdministrator(AdministratorViewModel administratorViewModel)
+        {
+            Administrator admin = new Administrator()
+            {
+                UserId = administratorViewModel.UserId,
+                Username = administratorViewModel.Username,
+                Password = administratorViewModel.Password,
+                Fname = administratorViewModel.Fname,
+                LName = administratorViewModel.LName,
+                Acesslevel = administratorViewModel.Acesslevel
+            };
+            return admin;
+        }
 
 
+        //customer
         /// <summary>
         /// Converts a customer model to a customer viewmodel
         /// </summary>
@@ -19,6 +55,10 @@ namespace BusinessLogicLayer
         /// <returns></returns>
         public CustomerViewModel ConvertCustomerToCustomerViewModel(Customer customer)
         {
+            if (customer.DefaultLocation == null)
+            {
+                customer.DefaultLocation = _repository.GetDefautLocation();
+            }
             CustomerViewModel customerViewModel = new CustomerViewModel()
             {
                 UserId = customer.UserId,
@@ -29,6 +69,24 @@ namespace BusinessLogicLayer
                 DefaultLocationId = customer.DefaultLocation.LocationId
             };
             return customerViewModel;
+        }
+        /// <summary>
+        /// Converts a customer veiwmodel into a customer model
+        /// </summary>
+        /// <param name="customerViewModel"></param>
+        /// <returns></returns>
+        public Customer ConvertCustomerViewModelToCustomer(CustomerViewModel customerViewModel)
+        {
+            Customer customer = new Customer()
+            {
+                UserId = customerViewModel.UserId,
+                Username = customerViewModel.Username,
+                Password = customerViewModel.Password,
+                Fname = customerViewModel.Fname,
+                LName = customerViewModel.LName,
+                DefaultLocation =  _repository.GetLocationById(customerViewModel.DefaultLocationId) 
+            };
+            return customer;
         }
 
         /// <summary>
@@ -48,11 +106,64 @@ namespace BusinessLogicLayer
                 //product stuff
                 ProductName = inventory.Product.ProductName,
                 Price = inventory.Product.Price,
-                Description = inventory.Product.Description
-
+                Description = inventory.Product.Description,
+                //location stuff
+                LocationName = inventory.Product.ProductName         
             };
             return inventoryViewModel;
         }
+        /// <summary>
+        /// Converts an inventory viewmodel to an inventory model
+        /// </summary>
+        /// <param name="inventoryViewModel"></param>
+        /// <returns></returns>
+        public Inventory ConvertInventoryViewModelToInventory(InventoryViewModel inventoryViewModel)
+        {
+            Inventory inventory = new Inventory()
+            {
+                InventoryId = inventoryViewModel.InventoryId,
+                Quantity = inventoryViewModel.Quantity,
+                //foreign keys
+                Location = _repository.GetLocationById(inventoryViewModel.LocationId),
+                Product = _repository.GetProductById(inventoryViewModel.ProductId),
+
+            };
+            return inventory;
+        }
+
+        /// <summary>
+        /// Converts a product viewmodel into a model and returns it
+        /// </summary>
+        /// <param name="productViewModel"></param>
+        /// <returns></returns>
+        public Product ConvertProductViewModelToProduct(ProductViewModel productViewModel)
+        {
+            Product product = new Product()
+            {
+                ProductId = productViewModel.ProductId,
+                ProductName = productViewModel.ProductName,
+                Price = productViewModel.Price,
+                Description = productViewModel.Description
+            };
+            return product;
+        }
+        /// <summary>
+        /// Converts a product into a product viewmodel and returns it
+        /// </summary>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        public ProductViewModel ConvertProductToProductViewModel(Product product)
+        {
+            ProductViewModel productViewModel = new ProductViewModel()
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                Price = product.Price,
+                Description = product.Description
+            };
+            return productViewModel;
+        }
+
 
         /// <summary>
         /// Converts location model to location viewmodel
@@ -68,6 +179,16 @@ namespace BusinessLogicLayer
 
             };
             return locationViewModel;
+        }
+        public Location ConvertLocationViewModelToLocation(LocationViewModel locationViewModel)
+        {
+            Location location = new Location()
+            {
+                LocationId = locationViewModel.LocationId,
+                Name = locationViewModel.Name
+
+            };
+            return location;
         }
     }
 }

@@ -10,7 +10,7 @@ using RepositoryLayer;
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20210107230446_initmigration")]
+    [Migration("20210109224406_initmigration")]
     partial class initmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,10 +23,9 @@ namespace RepositoryLayer.Migrations
 
             modelBuilder.Entity("Models.Administrator", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Acesslevel")
                         .HasColumnType("int");
@@ -54,10 +53,12 @@ namespace RepositoryLayer.Migrations
 
             modelBuilder.Entity("Models.Customer", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DefaultLocationLocationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Fname")
                         .HasMaxLength(20)
@@ -77,21 +78,22 @@ namespace RepositoryLayer.Migrations
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("DefaultLocationLocationId");
+
                     b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Models.Inventory", b =>
                 {
-                    b.Property<int>("InventoryId")
+                    b.Property<Guid>("InventoryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("LocationId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("LocationId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -107,10 +109,9 @@ namespace RepositoryLayer.Migrations
 
             modelBuilder.Entity("Models.Location", b =>
                 {
-                    b.Property<int>("LocationId")
+                    b.Property<Guid>("LocationId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -122,13 +123,12 @@ namespace RepositoryLayer.Migrations
 
             modelBuilder.Entity("Models.Order", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<Guid>("OrderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("CustomerUserId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("CustomerUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -142,16 +142,15 @@ namespace RepositoryLayer.Migrations
 
             modelBuilder.Entity("Models.OrderLine", b =>
                 {
-                    b.Property<int>("OrderLineId")
+                    b.Property<Guid>("OrderLineId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("InventoryId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("InventoryId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("OrderId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -167,10 +166,9 @@ namespace RepositoryLayer.Migrations
 
             modelBuilder.Entity("Models.Product", b =>
                 {
-                    b.Property<int>("ProductId")
+                    b.Property<Guid>("ProductId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -184,6 +182,15 @@ namespace RepositoryLayer.Migrations
                     b.HasKey("ProductId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Models.Customer", b =>
+                {
+                    b.HasOne("Models.Location", "DefaultLocation")
+                        .WithMany()
+                        .HasForeignKey("DefaultLocationLocationId");
+
+                    b.Navigation("DefaultLocation");
                 });
 
             modelBuilder.Entity("Models.Inventory", b =>

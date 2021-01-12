@@ -30,7 +30,9 @@ namespace MvcStoreApplication
             services.AddScoped<Repository>();
             services.AddScoped<BusinessLogic>();
             services.AddScoped<Mapper>();
+            services.AddSession();
 
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +54,8 @@ namespace MvcStoreApplication
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,34 +1,27 @@
-﻿@model Models.Administrator
+﻿@model Models.ViewModels.CustomerViewModel
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "CustomerDetails";
 }
 
-<h1>Delete</h1>
+<h1>CustomerDetails</h1>
 
-<h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>Administrator</h4>
+    <h4>CustomerViewModel</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Username)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Username)
         </dd>
-        <dt class = "col-sm-2">
+        @*<dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Password)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Password)
-        </dd>
+        </dd>*@
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Fname)
         </dt>
@@ -42,15 +35,26 @@
             @Html.DisplayFor(model => model.LName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Acesslevel)
+            @Html.DisplayNameFor(model => model.DefaultStoreName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Acesslevel)
+            @Html.DisplayFor(model => model.DefaultStoreName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DefaultLocationId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DefaultLocationId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UserId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UserId)
         </dd>
     </dl>
-    
-    <form asp-action="Delete">
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+</div>
+<div>
+    @*@Html.ActionLink("Edit", "EditCustomer", new { /* id = Model.PrimaryKey */ }) |*@
+    <a asp-action="Index">Back to List</a>
 </div>

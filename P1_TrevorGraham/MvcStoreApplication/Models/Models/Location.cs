@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 // using System.ComponentModel.DataAnnotations.Schema;
@@ -7,7 +8,7 @@ namespace Models
     public class Location
     {
         [Key]
-        public int LocationId{get;set;}
+        public Guid LocationId{get;set;}
 
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
         public string Name {get;set;}

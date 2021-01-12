@@ -1,22 +1,22 @@
-﻿@model Models.Administrator
+﻿@model Models.ViewModels.AdministratorViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "CreateAdmin";
 }
 
-<h1>Edit</h1>
+<h1>CreateAdmin</h1>
 
-<h4>Administrator</h4>
+<h4>AdministratorViewModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="View">
+        <form asp-action="CreateAdmin">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            @*<div class="form-group">
                 <label asp-for="UserId" class="control-label"></label>
                 <input asp-for="UserId" class="form-control" />
                 <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
+            </div>*@
             <div class="form-group">
                 <label asp-for="Username" class="control-label"></label>
                 <input asp-for="Username" class="form-control" />
@@ -37,13 +37,14 @@
                 <input asp-for="LName" class="form-control" />
                 <span asp-validation-for="LName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            @*TODO: dropdown menu here*@
+            @*<div class="form-group">
                 <label asp-for="Acesslevel" class="control-label"></label>
                 <input asp-for="Acesslevel" class="form-control" />
                 <span asp-validation-for="Acesslevel" class="text-danger"></span>
-            </div>
+            </div>*@
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="CreateAdmin" class="btn btn-primary" />
             </div>
         </form>
     </div>

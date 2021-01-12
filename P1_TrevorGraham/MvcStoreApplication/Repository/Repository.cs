@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,45 @@ namespace RepositoryLayer
             _dbContext = dbContext;
         }
 
+        #region Users
+        /// <summary>
+        /// returns an IUser that contains the username if the password is correct. if the username or password is wrong, returns null
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public IUser AttemptSignInWithUsernameAndPassword(string username, string password)
+        {
+            Administrator admin = GetAdministratorByUsername(username);
+            Customer cust = GetCustomerByUsername(username);
+            //check customers
+            if (cust != null)
+            {
+                if (cust.Password == password)
+                {
+                    //successful login
+                    return cust;
+                }
+            }
+            //check admins
+            else if(admin != null)
+            {
+                if (admin.Password == password)
+                {
+                    //successful login
+                    return admin;
+                }
+            }
+            //login was not successful
+            return null;
+        }
+        public bool UsernameAlreadyExists(string username)
+        {
+            return CustomerIsInDb(username) || AdministratorIsInDb(username);
+        }
+
+        #endregion
+
         #region Customers
         /// <summary>
         /// Attempts to add customer to db and returns whether or not it was successful
@@ -24,7 +64,7 @@ namespace RepositoryLayer
         public bool AttemptAddCustomerToDb(Customer customer)
         {
             //if there is not a product in the db with the same id or name
-            if (!CustomerIsInDb(customer))
+            if (!CustomerIsInDb(customer)&&!UsernameAlreadyExists(customer.Username))
             {
                 //add it
                 _dbContext.Customers.Add(customer);
@@ -36,7 +76,13 @@ namespace RepositoryLayer
                 //TODO:check if customer was already in db and give some sort of warning
             }
             return false;
+            
         }
+        public bool UserIsCustomer(Guid userId)
+        {
+            return _dbContext.Customers.SingleOrDefault(x => x.UserId == userId) != null;
+        }
+
         /// <summary>
         /// checks if the given customer is in the db based on id and username
         /// </summary>
@@ -44,21 +90,33 @@ namespace RepositoryLayer
         /// <returns></returns>
         public bool CustomerIsInDb(Customer customer)
         {
-            return _dbContext.Customers.ToList().Where(x => x.UserId == customer.UserId||x.Username == customer.Username).Count() > 0;
+            if (customer !=null)
+            return _dbContext.Customers.ToList().Where(x => x.UserId == customer.UserId || x.Username == customer.Username).Count() > 0;
+            return false;
         }
-        public bool CustomerIsInDb(int customerId)
+        public bool CustomerIsInDb(Guid customerId)
         {
             return CustomerIsInDb(GetCustomerById(customerId));
         }
+        public bool CustomerIsInDb(string username)
+        {
+            return CustomerIsInDb(GetCustomerByUsername(username));
+        }
+
         /// <summary>
         /// returns a customer object based on the given customer id
         /// </summary>
         /// <param name="customerId"></param>
         /// <returns></returns>
-        public Customer GetCustomerById(int customerId)
+        public Customer GetCustomerById(Guid customerId)
         {
             return _dbContext.Customers.FirstOrDefault(x => x.UserId == customerId);
         }
+        public Customer GetCustomerByUsername(string username)
+        {
+            return _dbContext.Customers.FirstOrDefault(x => x.Username == username);
+        }
+
         /// <summary>
         /// returns a list of all of the customers
         /// </summary>
@@ -67,6 +125,61 @@ namespace RepositoryLayer
         {
             return _dbContext.Customers.ToList();
         }
+        #endregion
+        #region Administrators
+        /// <summary>
+        /// Attempts to add admin to db and returns whether or not it was successful
+        /// </summary>
+        /// <param name="admin"></param>
+        /// <returns></returns>
+        public bool AttemptAddAdministratorToDb(Administrator admin)
+        {
+            //if there is not a product in the db with the same id or name
+            if (!AdministratorIsInDb(admin) && !UsernameAlreadyExists(admin.Username))
+            {
+                //add it
+                _dbContext.Administrators.Add(admin);
+                _dbContext.SaveChanges();
+                return AdministratorIsInDb(admin);
+            }
+            else
+            {
+                //TODO:check if admin was already in db and give some sort of warning
+            }
+            return false;
+        }
+        public bool UserIsAdministrator(Guid userId)
+        {
+            return _dbContext.Administrators.SingleOrDefault(x => x.UserId == userId) != null;
+        }
+        public bool AdministratorIsInDb(Administrator admin)
+        {
+            if(admin!=null)
+                return _dbContext.Administrators.ToList().Where(x => x.UserId == admin.UserId || x.Username == admin.Username).Count() > 0;
+            return false;
+        }
+        public bool AdministratorIsInDb(Guid adminId)
+        {
+            return AdministratorIsInDb(GetAdministratorById(adminId));
+        }
+        public bool AdministratorIsInDb(string username)
+        {
+            return AdministratorIsInDb(GetAdministratorByUsername(username));
+        }
+        public Administrator GetAdministratorById(Guid adminId)
+        {
+            return _dbContext.Administrators.FirstOrDefault(x => x.UserId == adminId);
+        }
+        public Administrator GetAdministratorByUsername(string username)
+        {
+            return _dbContext.Administrators.FirstOrDefault(x => x.Username == username);
+        }
+
+        public List<Administrator> GetAllAdministrators()
+        {
+            return _dbContext.Administrators.ToList();
+        }
+
         #endregion
 
         #region Products
@@ -124,7 +237,7 @@ namespace RepositoryLayer
         {
             return (_dbContext.Products.ToList().Where(x => x.ProductId == product.ProductId || x.ProductName == product.ProductName).Count() > 0);
         }
-        public bool ProductIsInDb(int productId)
+        public bool ProductIsInDb(Guid productId)
         {
             return ProductIsInDb(GetProductById(productId));
         }
@@ -133,7 +246,7 @@ namespace RepositoryLayer
         /// </summary>
         /// <param name="productId"></param>
         /// <returns></returns>
-        public Product GetProductById(int productId)
+        public Product GetProductById(Guid productId)
         {
             return _dbContext.Products.FirstOrDefault(x => x.ProductId == productId);
         }
@@ -150,10 +263,10 @@ namespace RepositoryLayer
         /// </summary>
         /// <param name="currentLocationId"></param>
         /// <returns></returns>
-        public List<Inventory> GetLocationInventories(int currentLocationId)
+        public List<Inventory> GetLocationInventories(Guid currentLocationId)
         {
             List<Inventory> filteredInventories = new List<Inventory>();
-            return _dbContext.Inventories.Where(x => x.Location.LocationId == currentLocationId).ToList();
+            return _dbContext.Inventories.Include(x=>x.Product).Where(x => x.Location.LocationId == currentLocationId).ToList();
         }
 
         #endregion
@@ -185,7 +298,7 @@ namespace RepositoryLayer
             return (_dbContext.Locations.ToList().Where(x => x.LocationId == location.LocationId || x.Name == location.Name).Count() > 0);
             
         }
-        public bool LocationIsInDb(int locationId)
+        public bool LocationIsInDb(Guid locationId)
         {
             return LocationIsInDb(GetLocationById(locationId));
         }
@@ -194,7 +307,7 @@ namespace RepositoryLayer
         /// </summary>
         /// <param name="locationId"></param>
         /// <returns></returns>
-        public Location GetLocationById(int locationId)
+        public Location GetLocationById(Guid locationId)
         {
             return _dbContext.Locations.FirstOrDefault(x => x.LocationId == locationId);
         }
@@ -215,5 +328,48 @@ namespace RepositoryLayer
             return _dbContext.Locations.FirstOrDefault();
         }
         #endregion
+
+        public void PopulateDb()
+        {
+            if (_dbContext.Locations.Count() < 1)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    Location newLocation = new Location()
+                    {
+                        Name = $"Store + {i}"
+                    };
+                    AttemptAddLocationToDb(newLocation);
+                }
+            }
+            if (_dbContext.Products.Count() < 1)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    Product product = new Product()
+                    {
+                        ProductName = $"Product {i}",
+                        Price = i + 1,
+                        Description = "Something Special"
+                    };
+                    AttemptAddProductToDb(product);
+                }
+            }
+            //restock stores
+            if (_dbContext.Inventories.Count() < 1)
+            {
+                foreach (Location store in _dbContext.Locations.ToList())
+                {
+                    //var storeInv = _dbContext.Inventories.Include(x=>x.Location).Select(x => x.Location.Equals(store)).ToList();
+                    //if (storeInv.Count() < 1)
+                // Store.Inventorys.Count()<1){
+                    foreach (Product product in _dbContext.Products.ToList())
+                    {
+                        AttemptAddProductToStore(product, store, 10);
+                    }
+                }
+            }
+            //}
+        }
     }
 }

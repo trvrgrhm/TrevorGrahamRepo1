@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Models
@@ -5,7 +6,7 @@ namespace Models
     public class Inventory
     {
         [Key]
-        public int InventoryId{get;set;}
+        public Guid InventoryId{get;set;}
         public int Quantity {get;set;}
         
         //FK

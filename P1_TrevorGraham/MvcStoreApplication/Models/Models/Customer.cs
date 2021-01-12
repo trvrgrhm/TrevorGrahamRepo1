@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,7 +8,7 @@ namespace Models
     public class Customer: IUser
     {
         [Key]
-        public int UserId{get;set;}
+        public Guid UserId{get;set;}
 
         [StringLength(20, MinimumLength = 5, ErrorMessage = "The username must be between 5 and 20 characters.")]
         [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Use letters and numbers only please")]

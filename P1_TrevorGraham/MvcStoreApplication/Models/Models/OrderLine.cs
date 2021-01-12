@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Models
@@ -5,7 +6,7 @@ namespace Models
     public class OrderLine
     {
         [Key]
-        public int OrderLineId {get;set;}
+        public Guid OrderLineId {get;set;}
 
 
         [Range(0,int.MaxValue)]

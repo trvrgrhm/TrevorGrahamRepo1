@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 
 namespace Models.ViewModels
 {
-    public class LocationViewModel
+    public class LocationWithInventoriesViewModel
     {
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
         [Display(Name = "Store Name")]
         public string Name { get; set; }
 
+
         [Display(Name = "ID")]
         public Guid LocationId { get; set; }
+
+        [Display(Name = "Inventory")]
+        public List<InventoryViewModel> InventoryItems { get; set; }
     }
 }

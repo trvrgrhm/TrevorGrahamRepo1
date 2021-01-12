@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Models.ViewModels.LocationViewModel>
+
+@{
+    ViewData["Title"] = "Store Locations";
+}
+
+<h1>View</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.LocationId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.LocationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @*@Html.ActionLink("Edit", "Edit", new { id = item.LocationId }) |*@
+                @Html.ActionLink("Details", "Details", new { id = item.LocationId }) |
+                @Html.ActionLink("Inventory Details", "InventoryDetails", new { id = item.LocationId }) 
+                @*@Html.ActionLink("Delete", "Delete", new { id = item.LocationId })*@
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
