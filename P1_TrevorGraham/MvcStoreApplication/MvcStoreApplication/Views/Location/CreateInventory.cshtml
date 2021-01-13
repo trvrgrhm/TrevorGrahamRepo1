@@ -1,0 +1,100 @@
+﻿@model Models.ViewModels.InventoryViewModel
+
+@using Models.ViewModels
+@{
+    ViewData["Title"] = "CreateInventory";
+
+    ViewData["Product Name"] = "";
+    ViewData["Product Price"] = "";
+    ViewData["Product Description"] = "";
+}
+
+<h1>Location: @Model.LocationName</h1>
+
+<h4>Add Inventory</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+
+        <form asp-action="FinishCreateInventory">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @*<div class="form-group">
+            <label asp-for="LocationName" class="control-label"></label>
+            <input asp-for="LocationName" class="form-control" />
+            <span asp-validation-for="LocationName" class="text-danger"></span>
+        </div>*@
+
+            @*<div class="form-group">
+            <label asp-for="InventoryId" class="control-label"></label>
+            <input asp-for="InventoryId" class="form-control" />
+            <span asp-validation-for="InventoryId" class="text-danger"></span>
+        </div>*@
+            @*<div class="form-group">
+            <label asp-for="LocationId" class="control-label"></label>
+            <input asp-for="LocationId" class="form-control" />
+            <span asp-validation-for="LocationId" class="text-danger"></span>
+        </div>*@
+
+            @Html.HiddenFor(x => x.LocationId)
+            @*TODO: dropdown here*@
+            <select class="form-control" id="ProductId" name="ProductId">
+                @foreach (ProductViewModel product in ViewBag.Products)
+                {
+                    <option value="@product.ProductId" onselect="productChange(@product)">@product.ProductName</option>
+                }
+            </select>
+            @*<div class="form-group">
+            <label asp-for="ProductId" class="control-label"></label>
+            <input asp-for="ProductId" class="form-control" />
+            <span asp-validation-for="ProductId" class="text-danger"></span>
+        </div>*@
+            @*<div class="form-group">
+            <label asp-for="ProductName" class="control-label"></label>
+            <input asp-for="ProductName" class="form-control" />
+            <span asp-validation-for="ProductName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Price" class="control-label"></label>
+            <input asp-for="Price" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description" class="control-label"></label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>*@
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                <input asp-for="Quantity" class="form-control" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+        @*<div>
+            <p>
+                @ViewData["Product Name"]<br />
+                @ViewData["Product Price"] <br />
+                @ViewData["Product Description"] <br />
+            </p>
+        </div>*@
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<script>
+    function productChange(productViewModel) {
+        @ViewData["Product Name"] = productViewModel.ProductName;
+        @ViewData["Product Price"] = productViewModel.Price;
+        @ViewData["Product Description"] = productViewModel.Description;
+    }
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}

@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
+
+    @using BusinessLogicLayer
+    @inject BusinessLogic _businessLogic
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
@@ -24,6 +28,38 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @if (!_businessLogic.UserIsSignedIn())
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="SignIn">Sign In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Create">Sign Up</a>
+                            </li>
+                        }
+                        else
+                        {
+                            @*if user is not signed in, show logout button*@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="SignOutUser">Sign Out</a>
+                            </li>
+                        }
+                        @*Checks if user is admin*@
+                        @if (_businessLogic.CurrentUserIsAdministrator())
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Administration">Administration</a>
+                            </li>
+                        }
+                        @if (_businessLogic.CurrentUserIsCustomer())
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="ViewCart">View Cart</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="ListOrders">Order History</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
