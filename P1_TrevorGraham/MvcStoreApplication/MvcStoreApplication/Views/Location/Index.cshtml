@@ -4,16 +4,16 @@
     ViewData["Title"] = "Store Locations";
 }
 
-<h1>View</h1>
+<h1>Store Locations</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Create New Location</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LocationId)
+                @*@Html.DisplayNameFor(model => model.LocationId)*@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
@@ -25,14 +25,14 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.LocationId)
+                @Html.HiddenFor(modelItem => item.LocationId)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
                 @*@Html.ActionLink("Edit", "Edit", new { id = item.LocationId }) |*@
-                @Html.ActionLink("Details", "Details", new { id = item.LocationId }) |
+                @*@Html.ActionLink("Details", "Details", new { id = item.LocationId }) |*@
                 @Html.ActionLink("Inventory Details", "InventoryDetails", new { id = item.LocationId }) 
                 @*@Html.ActionLink("Delete", "Delete", new { id = item.LocationId })*@
             </td>

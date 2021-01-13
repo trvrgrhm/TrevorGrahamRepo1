@@ -9,7 +9,8 @@ namespace Models.ViewModels
 {
     public class LocationViewModel
     {
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
+        [Required]
+        [RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Use letters only please")]
         [Display(Name = "Store Name")]
         public string Name { get; set; }
 
