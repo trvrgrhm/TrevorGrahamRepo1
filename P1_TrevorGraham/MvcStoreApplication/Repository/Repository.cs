@@ -48,6 +48,11 @@ namespace RepositoryLayer
             //login was not successful
             return null;
         }
+        /// <summary>
+        /// returns whether or not the username already exists in the db as an admin or customer
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         public bool UsernameAlreadyExists(string username)
         {
             return CustomerIsInDb(username) || AdministratorIsInDb(username);
@@ -78,6 +83,11 @@ namespace RepositoryLayer
             return false;
             
         }
+        /// <summary>
+        /// Returns whether or not the requested user is a customer
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public bool UserIsCustomer(Guid userId)
         {
             return _dbContext.Customers.SingleOrDefault(x => x.UserId == userId) != null;
@@ -94,10 +104,20 @@ namespace RepositoryLayer
             return _dbContext.Customers.ToList().Where(x => x.UserId == customer.UserId || x.Username == customer.Username).Count() > 0;
             return false;
         }
+        /// <summary>
+        /// Returns whether or not the requested guid is a customer in the db
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
         public bool CustomerIsInDb(Guid customerId)
         {
             return CustomerIsInDb(GetCustomerById(customerId));
         }
+        /// <summary>
+        /// Retunrs whether or not the requested username is a customer in the db
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         public bool CustomerIsInDb(string username)
         {
             return CustomerIsInDb(GetCustomerByUsername(username));
@@ -112,6 +132,11 @@ namespace RepositoryLayer
         {
             return _dbContext.Customers.Include(x=>x.DefaultLocation).FirstOrDefault(x => x.UserId == customerId);
         }
+        /// <summary>
+        /// returns a customer object based on the given username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         public Customer GetCustomerByUsername(string username)
         {
             return _dbContext.Customers.FirstOrDefault(x => x.Username == username);
@@ -224,6 +249,11 @@ namespace RepositoryLayer
             }
             return false;
         }
+        /// <summary>
+        /// returns whether or not the given inventory is in the db
+        /// </summary>
+        /// <param name="inventory"></param>
+        /// <returns></returns>
         public bool InventoryIsInDb(Inventory inventory)
         {
             return _dbContext.Inventories.ToList().Where(x => x.InventoryId == inventory.InventoryId).Count()>0;
@@ -237,6 +267,11 @@ namespace RepositoryLayer
         {
             return (_dbContext.Products.ToList().Where(x => x.ProductId == product.ProductId || x.ProductName == product.ProductName).Count() > 0);
         }
+        /// <summary>
+        /// returns whether or not the given guid is related to a product in the db
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <returns></returns>
         public bool ProductIsInDb(Guid productId)
         {
             return ProductIsInDb(GetProductById(productId));
@@ -258,7 +293,11 @@ namespace RepositoryLayer
         {
             return _dbContext.Products.ToList();
         }
-
+        /// <summary>
+        /// returns the inventory in the db based on the id given
+        /// </summary>
+        /// <param name="inventoryId"></param>
+        /// <returns></returns>
         public Inventory GetInventoryById(Guid inventoryId)
         {
             return _dbContext.Inventories.Include(x=>x.Location).Include(x=>x.Product).FirstOrDefault(x => x.InventoryId == inventoryId);
@@ -302,6 +341,11 @@ namespace RepositoryLayer
             return (_dbContext.Locations.ToList().Where(x => x.LocationId == location.LocationId || x.Name == location.Name).Count() > 0);
             
         }
+        /// <summary>
+        /// returns whether or not the requested location is in the db based on a guid
+        /// </summary>
+        /// <param name="locationId"></param>
+        /// <returns></returns>
         public bool LocationIsInDb(Guid locationId)
         {
             return LocationIsInDb(GetLocationById(locationId));
@@ -401,6 +445,11 @@ namespace RepositoryLayer
             }
             return false;
         }
+        /// <summary>
+        /// returns whether or not the given order is related to any orderlines in the db
+        /// </summary>
+        /// <param name="order"></param>
+        /// <returns></returns>
         public bool OrderContainsOrderLines(Order order)
         {
             if(order!=null)
@@ -436,18 +485,29 @@ namespace RepositoryLayer
             }
             return false;
         }
-
+        /// <summary>
+        /// returns an order based on the given guid id
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
         public Order GetOrderById(Guid orderId)
         {
             return _dbContext.Orders.Include(x=>x.Customer).FirstOrDefault(x => x.OrderId == orderId);
         }
-
+        /// <summary>
+        /// returns all of the orders in the db based on the given customer guid id
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
         public List<Order> GetAllCustomerOrders(Guid customerId)
         {
             return _dbContext.Orders.Include(x => x.Customer).Where(x => x.Customer.UserId == customerId).ToList();
         }
 
         #endregion
+        /// <summary>
+        /// used to populate the db if it is empty
+        /// </summary>
         public void PopulateDb()
         {
             if (_dbContext.Locations.Count() < 1)
@@ -474,6 +534,20 @@ namespace RepositoryLayer
                     AttemptAddProductToDb(product);
                 }
             }
+            //Product newProduct = new Product()
+            //{
+            //    ProductName = $"Sandwich",
+            //    Price = 4.65,
+            //    Description = "A sandwich with ham, lettuce, tomato, and mayo."
+            //};
+            //AttemptAddProductToDb(newProduct);
+            // newProduct = new Product()
+            //{
+            //    ProductName = $"Hammer",
+            //    Price = 18.93,
+            //    Description = "A tool that is used to whack various other objects.",
+            //};
+            //AttemptAddProductToDb(newProduct);
             //restock stores
             if (_dbContext.Inventories.Count() < 1)
             {

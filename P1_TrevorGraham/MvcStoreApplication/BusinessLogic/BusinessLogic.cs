@@ -50,13 +50,18 @@ namespace BusinessLogicLayer
             Customer customer = _mapper.ConvertCustomerViewModelToCustomer(customerViewModel);
             if (_repository.AttemptAddCustomerToDb(customer))
             {
-                if(AttemptSignIn(customerViewModel.Username,customerViewModel.Password))
+                if (AttemptSignIn(customerViewModel.Username, customerViewModel.Password))
                 {
                     return true;
                 }
             }
             return false;
         }
+        /// <summary>
+        /// requests the repository to create a new Admin in the db based on a viewmodel
+        /// </summary>
+        /// <param name="adminViewModel"></param>
+        /// <returns></returns>
         public bool CreateNewAdministrator(AdministratorViewModel adminViewModel)
         {
             if (UsernameExists(adminViewModel.Username))
@@ -66,9 +71,12 @@ namespace BusinessLogicLayer
             Administrator admin = _mapper.ConvertAdministratorViewModelToAdministrator(adminViewModel);
             return _repository.AttemptAddAdministratorToDb(admin);
         }
-
-
-
+        /// <summary>
+        /// attempts to login based on a username and password, and if successful, sets the session values to the correct values
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public bool AttemptSignIn(string username, string password)
         {
             IUser user = _repository.AttemptSignInWithUsernameAndPassword(username, password);
@@ -77,7 +85,7 @@ namespace BusinessLogicLayer
                 return false;
             }
             //assign current location
-            else if(user is Customer)
+            else if (user is Customer)
             {
                 //var customer = _repository.GetCustomerById(user.UserId);
 
@@ -94,7 +102,9 @@ namespace BusinessLogicLayer
             SessionAssignCurrentUser(user.UserId);
             return true;
         }
-
+        /// <summary>
+        /// removes the current user's values from the session
+        /// </summary>
         public void SignOut()
         {
             SessionClearCurrentUser();
@@ -105,12 +115,16 @@ namespace BusinessLogicLayer
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        
         public bool UserIsSignedIn()
         {
             //return currentUserId != null;
             return SessionGetCurrentUser() != null;
         }
+        /// <summary>
+        /// returns whether or not the username exists in the db
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         public bool UsernameExists(string username)
         {
             return _repository.UsernameAlreadyExists(username);
@@ -127,6 +141,10 @@ namespace BusinessLogicLayer
                 return _repository.UserIsCustomer((Guid)GetCurrentCustomer());
             else return false;
         }
+        /// <summary>
+        /// returns the session value for the current customer
+        /// </summary>
+        /// <returns></returns>
         public Guid? GetCurrentCustomer()
         {
             //return currentUserId;
@@ -177,6 +195,10 @@ namespace BusinessLogicLayer
             }
             return allCustomerViewModels;
         }
+        /// <summary>
+        /// creates viewmodels for all admins based on admins in the db
+        /// </summary>
+        /// <returns></returns>
         public List<AdministratorViewModel> GetAllAdminViewModels()
         {
             List<Administrator> allCustomers = _repository.GetAllAdministrators();
@@ -206,9 +228,9 @@ namespace BusinessLogicLayer
         public List<InventoryViewModel> GetInventoryModelsForCurrentLocation()
         {
             //if (currentLocationId != null)
-                if (SessionGetCurrentLocation() != null)
+            if (SessionGetCurrentLocation() != null)
                 //return GetInventoryModelsForLocation((Guid)currentLocationId);
-            return GetInventoryModelsForLocation((Guid)SessionGetCurrentLocation());
+                return GetInventoryModelsForLocation((Guid)SessionGetCurrentLocation());
             else return GetInventoryModelsForLocation(_repository.GetDefautLocation().LocationId);
         }
         /// <summary>
@@ -228,7 +250,11 @@ namespace BusinessLogicLayer
         #endregion
 
         #region locations
-
+        /// <summary>
+        /// attempts to add a product to the inventory, and returns whether or not it was successful
+        /// </summary>
+        /// <param name="viewModel"></param>
+        /// <returns></returns>
         public bool AddProductToInventory(InventoryViewModel viewModel)
         {
             return _repository.AttemptAddProductToStore(
@@ -236,11 +262,15 @@ namespace BusinessLogicLayer
                 _repository.GetLocationById(viewModel.LocationId),
                 viewModel.Quantity);
         }
-
+        /// <summary>
+        /// returns viewmodels for inventory lines for the given location guid id
+        /// </summary>
+        /// <param name="locationId"></param>
+        /// <returns></returns>
         public LocationWithInventoriesViewModel GetInventoryDetails(Guid locationId)
         {
             Location location = _repository.GetLocationById(locationId);
-            if(location == null)
+            if (location == null)
             {
                 location = _repository.GetDefautLocation();
             }
@@ -253,10 +283,19 @@ namespace BusinessLogicLayer
             };
             return locationInventory;
         }
+        /// <summary>
+        /// returns a viewmodel for the request location guid id
+        /// </summary>
+        /// <param name="locationId"></param>
+        /// <returns></returns>
         public LocationViewModel GetLocationViewModel(Guid locationId)
         {
             return _mapper.ConvertLocationToLocationViewModel(_repository.GetLocationById(locationId));
         }
+        /// <summary>
+        /// returns a list of viewmodels for all of the locations in the db
+        /// </summary>
+        /// <returns></returns>
         public List<LocationViewModel> GetAllLocationViewModels()
         {
             List<Location> allLocations = _repository.GetAllLocations();
@@ -268,6 +307,11 @@ namespace BusinessLogicLayer
             }
             return locationViewModels;
         }
+        /// <summary>
+        /// attempts to set the current location in the session and returns whether or not it was successful
+        /// </summary>
+        /// <param name="locationId"></param>
+        /// <returns></returns>
         public bool SetCurrentLocation(Guid locationId)
         {
             if (_repository.LocationIsInDb(locationId))
@@ -279,6 +323,10 @@ namespace BusinessLogicLayer
             //if unsuccessful
             return false;
         }
+        /// <summary>
+        /// returns the current location from the session, if unsuccessful, returns the default location from the db
+        /// </summary>
+        /// <returns></returns>
         public Guid GetCurrentLocation()
         {
             if (SessionGetCurrentLocation() != null)
@@ -290,6 +338,11 @@ namespace BusinessLogicLayer
                 return _repository.GetDefautLocation().LocationId;
             }
         }
+        /// <summary>
+        /// attempts to create a new location in the db based on a viewmodel and returns whether or not it was successful
+        /// </summary>
+        /// <param name="newLocationViewModel"></param>
+        /// <returns></returns>
         public bool CreateNewLocation(LocationViewModel newLocationViewModel)
         {
             Location newLocation = new Location()
@@ -301,7 +354,11 @@ namespace BusinessLogicLayer
         #endregion
 
         #region orders
-
+        /// <summary>
+        /// returns an order viewmodel based on a given inventory viewmodel that it is being created from
+        /// </summary>
+        /// <param name="inventoryViewModel"></param>
+        /// <returns></returns>
         public OrderLineViewModel CreateOrderLine(InventoryViewModel inventoryViewModel)
         {
             OrderLineViewModel viewModel = new OrderLineViewModel()
@@ -311,10 +368,15 @@ namespace BusinessLogicLayer
                 ProductName = inventoryViewModel.ProductName,
                 Quantity = 0,
                 StoreName = inventoryViewModel.LocationName,
-                TotalPrice = 0,          
+                TotalPrice = 0,
             };
             return viewModel;
         }
+        /// <summary>
+        /// attempts to add a line to a cart based on a given orderline viewmodel and returns whether or not it was successful
+        /// </summary>
+        /// <param name="orderLineViewModel"></param>
+        /// <returns></returns>
         public bool AddToCart(OrderLineViewModel orderLineViewModel)
         {
             if (!CurrentUserIsCustomer())
@@ -328,7 +390,7 @@ namespace BusinessLogicLayer
             //check if orderline is empty
             //check if order amount is greater than inventory amount
             var dbInv = _repository.GetInventoryById(orderLineViewModel.InventoryId);
-            if (orderLineViewModel.Quantity <= 0||orderLineViewModel.Quantity>dbInv.Quantity)
+            if (orderLineViewModel.Quantity <= 0 || orderLineViewModel.Quantity > dbInv.Quantity)
             {
                 return false;
             }
@@ -337,11 +399,15 @@ namespace BusinessLogicLayer
             var line = _mapper.ConvertOrderLineViewModelToOrderLine(orderLineViewModel);
             //try to add to cart
             return _repository.AddItemToCart(cart, line);
-            
+
             //return false;
 
         }
-
+        /// <summary>
+        /// returns an order viewmodel based on the given order id
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
         public OrderViewModel GetOrderViewModel(Guid orderId)
         {
             //if (!CurrentUserIsCustomer()) { return null; }
@@ -377,6 +443,10 @@ namespace BusinessLogicLayer
             }
             return viewModel;
         }
+        /// <summary>
+        /// returns a viewmodel based on the currently open cart if a user is logged in
+        /// </summary>
+        /// <returns></returns>
         public OrderViewModel GetCart()
         {
             if (!CurrentUserIsCustomer()) { return null; }
@@ -387,7 +457,7 @@ namespace BusinessLogicLayer
             var cartLines = _repository.GetOrderLinesForOrder(cart.OrderId);
             var cartLineViewModels = new List<OrderLineViewModel>();
             double total = 0;
-            foreach(OrderLine line in cartLines)
+            foreach (OrderLine line in cartLines)
             {
                 var viewLine = _mapper.ConvertOrderLineToOrderLineViewModel(line);
                 total += viewLine.TotalPrice;
@@ -403,11 +473,16 @@ namespace BusinessLogicLayer
                 StoreName = _repository.GetLocationById(loc).Name,
                 TotalPrice = total,
                 orderLines = cartLineViewModels
-                
+
             };
             return viewModel;
         }
-
+        /// <summary>
+        /// returns whether or not the given quantity is greater than the given inventory viewmodel based on the db
+        /// </summary>
+        /// <param name="quantity"></param>
+        /// <param name="inventoryViewModel"></param>
+        /// <returns></returns>
         public bool AmountIsGreaterThanInventory(int quantity, InventoryViewModel inventoryViewModel)
         {
             if (inventoryViewModel != null)
@@ -423,18 +498,26 @@ namespace BusinessLogicLayer
             }
             return true;
         }
+        /// <summary>
+        /// returns order viewmodels for every order in the db for the currently logged in user
+        /// </summary>
+        /// <returns></returns>
         public List<OrderViewModel> GetAllOrderViewModels()
         {
             if (!CurrentUserIsCustomer()) { return null; }
             var orders = _repository.GetAllCustomerOrders((Guid)SessionGetCurrentUser());
             var viewModels = new List<OrderViewModel>();
-            foreach(Order order in orders)
+            foreach (Order order in orders)
             {
                 var viewModel = GetOrderViewModel(order.OrderId);
                 viewModels.Add(viewModel);
             }
             return viewModels;
         }
+        /// <summary>
+        /// attempts to checkout and returns whether or not it was successful
+        /// </summary>
+        /// <returns></returns>
         public bool Checkout()
         {
             if (CurrentUserIsCustomer())
@@ -534,19 +617,14 @@ namespace BusinessLogicLayer
 
 
         //--------------------------------------------------------------Remember to delete this method please-----------------------------------------------------------
+        /// <summary>
+        /// used to populate db; shouldn't need this more than once
+        /// </summary>
         public void TempMethodDeleteMePlease()
         {
             _repository.PopulateDb();
         }
 
-        //private void btnSubmit_Click(object sender, System.EventArgs e)
-        //{
-        //    if (IsValid)
-        //    { // Set the Session value. 
-        //        Session[txtName.Text] = txtValue.Text; 
-        //        // Read and display the value we just set lbl
-        //        Result.Text = "The value of <b>" + txtName.Text + "</b> in the Session object is <b>" + Session[txtName.Text].ToString() + "</b>"; } }
 
-
-            }
+    }
 }
