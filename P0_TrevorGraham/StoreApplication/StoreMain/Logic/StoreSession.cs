@@ -62,7 +62,6 @@ namespace StoreApplication.Logic
             };
             cart.Add(cartLine);
             return true;
-
         }
 
         /// <summary>

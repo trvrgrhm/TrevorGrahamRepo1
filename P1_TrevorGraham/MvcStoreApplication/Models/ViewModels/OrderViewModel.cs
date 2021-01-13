@@ -15,6 +15,8 @@ namespace Models.ViewModels
         public double TotalPrice { get; set; }
         public DateTime Date { get; set; }
 
+        public List<OrderLineViewModel> orderLines { get; set; }
+
 
         [Display(Name = "ID")]
         public Guid OrderId { get; set; }

@@ -190,5 +190,84 @@ namespace BusinessLogicLayer
             };
             return location;
         }
+        public OrderLine ConvertOrderLineViewModelToOrderLine(OrderLineViewModel viewModel)
+        {
+            if(viewModel == null)
+            {
+                return null;
+            }
+            OrderLine line = new OrderLine()
+            {
+                Quantity = viewModel.Quantity,
+                OrderLineId = viewModel.OrderLineId
+            };
+            Inventory inv = _repository.GetInventoryById(viewModel.InventoryId);
+            Order ord = _repository.GetOrderById(viewModel.OrderId);
+            if (inv != null)
+            {
+                line.Inventory = inv;
+            }
+            if(ord != null)
+            {
+                line.Order = ord;
+            }
+            return line;
+        }
+
+        public OrderLineViewModel ConvertOrderLineToOrderLineViewModel(OrderLine orderLine)
+        {
+
+            var viewModel = new OrderLineViewModel()
+            {
+                OrderId = orderLine.Order.OrderId,
+                OrderLineId = orderLine.OrderLineId,
+                Quantity = orderLine.Quantity,
+            };
+            var inventory = _repository.GetInventoryById(orderLine.Inventory.InventoryId);
+            if (inventory != null)
+            {
+                viewModel.StoreName = inventory.Location.Name;
+                viewModel.InventoryId = orderLine.Inventory.InventoryId;
+
+                var product = inventory.Product;
+                var loc = inventory.Location;
+                if (product != null)
+                {
+                    viewModel.Price = product.Price;
+                    viewModel.ProductName = product.ProductName;
+                    viewModel.TotalPrice = product.Price * orderLine.Quantity;
+                }
+                if (loc != null)
+                {
+
+                }
+
+            }
+            return viewModel;
+
+        }
+
+        //public OrderViewModel ConvertOrderToOrderViewModel(Order order)
+        //{
+        //    var viewModel = new OrderViewModel()
+        //    {
+        //        OrderId = order.OrderId,
+        //        Date = order.Date,
+        //        orderLines = _repository.GetOrderLinesForOrder(order.OrderId),
+        //    };
+        //    return viewModel;
+        //}
     }
+
+    
+    //public OrderViewModel ConvertOrderToOrderViewModel(Order order)
+    //{
+    //    OrderViewModel viewModel= new OrderViewModel()
+    //    {
+
+    //    };
+    //    return viewModel;
+
+    //}
+
 }

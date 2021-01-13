@@ -9,6 +9,8 @@ namespace Models.ViewModels
 {
     public class OrderLineViewModel
     {
+        //[Display(Name="Customer")]
+        //public string CustomerName { get; set; }
         [Display(Name = "Store")]
         public string StoreName { get; set; }
         [Display(Name = "Product")]

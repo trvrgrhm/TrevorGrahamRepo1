@@ -1,0 +1,48 @@
+﻿@model Models.ViewModels.OrderViewModel
+
+@{
+    ViewData["Title"] = "ViewCart";
+}
+@using Models.ViewModels
+
+<h1>Order Details</h1>
+
+<div>
+    <h4>@Model.StoreName</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StoreName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StoreName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TotalPrice)
+        </dt>
+        <dd class="col-sm-10">
+            $ @Html.DisplayFor(model => model.TotalPrice)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+        <dd class="col-sm-10">
+            @Html.HiddenFor(model => model.OrderId)
+        </dd>
+        <dd class="col-sm-10">
+            @Html.HiddenFor(model => model.CustomerName)
+        </dd>
+        <dd class="col-sm-10">
+            @Html.HiddenFor(model => model.CustomerId)
+        </dd>
+        @*TODO: add list of items*@
+        @await Html.PartialAsync("_OrderLines", Model.orderLines)
+    </dl>
+</div>
+<div>
+    @*@Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |*@
+    <a asp-action="ListOrders">View All Order History</a>
+</div>

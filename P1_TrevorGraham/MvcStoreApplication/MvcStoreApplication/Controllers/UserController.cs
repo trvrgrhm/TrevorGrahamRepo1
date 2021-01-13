@@ -31,6 +31,10 @@ namespace MvcStoreApplication.Controllers
 
         public ActionResult SignIn()
         {
+            if (_businessLogic.UserIsSignedIn())
+            {
+                return RedirectToAction("Index", "Home");
+            }
             //check if already signed in
             return View();
         }
@@ -41,14 +45,11 @@ namespace MvcStoreApplication.Controllers
         {
             try
             {
-                _businessLogic.AttemptSignIn(username,password);
-                //var id = _businessLogic.GetCurrentCustomer();
-                //var serializedId = JsonConvert.SerializeObject(id);
-                //HttpContext.Session.SetString("current-user-key", serializedId);
-                //_session.SignIn((Guid)id);
-
-                //HttpContext.Session.SetString()
-                return RedirectToAction("Index", "Home");
+                if (_businessLogic.AttemptSignIn(username, password))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                return View();
             }
             catch
             {
@@ -56,10 +57,16 @@ namespace MvcStoreApplication.Controllers
             }
         }
 
+        public ActionResult SignOutUser()
+        {
+            _businessLogic.SignOut();
+            return RedirectToAction("Index", "Home");
+        }
+
 
         public ActionResult ListAllCustomers()
         {
-            var curCust = _businessLogic.GetCurrentCustomer();
+            //var curCust = _businessLogic.GetCurrentCustomer();
             //var curUser = _session.GetCurrentUser(HttpContext);
             if (_businessLogic.CurrentUserIsAdministrator())
             {
@@ -135,45 +142,45 @@ namespace MvcStoreApplication.Controllers
         }
 
         // GET: UserController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+        //public ActionResult Edit(int id)
+        //{
+        //    return View();
+        //}
 
-        // POST: UserController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        //// POST: UserController/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
 
         // GET: UserController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+        //public ActionResult Delete(int id)
+        //{
+        //    return View();
+        //}
 
-        // POST: UserController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        //// POST: UserController/Delete/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Delete(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
     }
 }

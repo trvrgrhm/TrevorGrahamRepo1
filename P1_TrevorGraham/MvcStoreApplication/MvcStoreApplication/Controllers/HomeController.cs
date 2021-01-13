@@ -1,6 +1,7 @@
 ﻿using BusinessLogicLayer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Models.ViewModels;
 using MvcStoreApplication.Models;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,15 @@ namespace MvcStoreApplication.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            if (_businessLogic.CurrentUserIsAdministrator())
+            {
+                return RedirectToAction("Administration");
+            }
+            var locationId = _businessLogic.GetCurrentLocation();
+
+            LocationWithInventoriesViewModel viewModel = _businessLogic.GetInventoryDetails(locationId);
+
+            return View(viewModel);
         }
 
         public IActionResult Privacy()

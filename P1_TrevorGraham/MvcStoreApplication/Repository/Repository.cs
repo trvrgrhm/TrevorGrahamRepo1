@@ -110,7 +110,7 @@ namespace RepositoryLayer
         /// <returns></returns>
         public Customer GetCustomerById(Guid customerId)
         {
-            return _dbContext.Customers.FirstOrDefault(x => x.UserId == customerId);
+            return _dbContext.Customers.Include(x=>x.DefaultLocation).FirstOrDefault(x => x.UserId == customerId);
         }
         public Customer GetCustomerByUsername(string username)
         {
@@ -258,6 +258,11 @@ namespace RepositoryLayer
         {
             return _dbContext.Products.ToList();
         }
+
+        public Inventory GetInventoryById(Guid inventoryId)
+        {
+            return _dbContext.Inventories.Include(x=>x.Location).Include(x=>x.Product).FirstOrDefault(x => x.InventoryId == inventoryId);
+        }
         /// <summary>
         /// Returns a list of all inventories based on the location id given
         /// </summary>
@@ -268,7 +273,6 @@ namespace RepositoryLayer
             List<Inventory> filteredInventories = new List<Inventory>();
             return _dbContext.Inventories.Include(x=>x.Product).Where(x => x.Location.LocationId == currentLocationId).ToList();
         }
-
         #endregion
 
         #region Locations
@@ -329,6 +333,121 @@ namespace RepositoryLayer
         }
         #endregion
 
+        #region orders
+
+        /// <summary>
+        /// gets an open order for the given customer id
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
+        public Order GetOpenCartForCustomer(Guid customerId)
+        {
+            Order cart = _dbContext.Orders.Include(x=>x.Customer).Where(x=>x.Customer.UserId==customerId).Where(x => x.OrderIsComplete == false).FirstOrDefault();
+            if (cart == null)
+            {
+                cart = new Order()
+                {
+                    OrderId = Guid.NewGuid(),
+                    Date = DateTime.Now,
+                    Customer = GetCustomerById(customerId),
+                    OrderIsComplete = false
+                };
+                _dbContext.SaveChanges();
+            }
+            return cart;
+        }
+
+        /// <summary>
+        /// returns a list of orderlines for the given order id
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public List<OrderLine> GetOrderLinesForOrder(Guid orderId)
+        {
+            return _dbContext.OrderLines.Include(x => x.Order).Include(x=>x.Inventory).Where(x => x.Order.OrderId == orderId).ToList();
+        }
+        /// <summary>
+        /// adds order to order line, decrements inventories for order line, and then saves to the db; returns true if successful
+        /// </summary>
+        /// <param name="cart"></param>
+        /// <param name="orderLine"></param>
+        /// <returns></returns>
+        public bool AddItemToCart(Order cart, OrderLine orderLine)
+        {
+            if (cart.OrderIsComplete)
+            {
+                return false;
+            }
+            orderLine.Inventory.Quantity -= orderLine.Quantity;
+            orderLine.Order = cart;
+            _dbContext.OrderLines.Add(orderLine);
+            _dbContext.SaveChanges();
+            return true;
+        }
+
+        /// <summary>
+        /// complete an order; returns false if there are no items in cart
+        /// </summary>
+        /// <param name="cart"></param>
+        /// <returns></returns>
+        public bool CompleteOrder(Order cart)
+        {
+            //if cart contains items
+            if(OrderContainsOrderLines(cart))
+            {
+                cart.OrderIsComplete = true;
+                _dbContext.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+        public bool OrderContainsOrderLines(Order order)
+        {
+            if(order!=null)
+           return _dbContext.OrderLines.Include(x => x.Order).Where(x => x.Order.OrderId == order.OrderId).Count() > 0;
+            return false;
+           
+        }
+        /// <summary>
+        /// removes an order line from the db; fails if line is not part of an order or if the order is already complete
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        public bool RemoveOrderLineFromOrder(OrderLine line)
+        {
+            if(line == null)
+            {
+                return false;
+            }
+            if (line.Order == null)
+                return false;
+            if (line.Order.OrderIsComplete)
+            {
+                return false;
+            }
+            if (_dbContext.OrderLines.Contains(line))
+            {
+                //restore quantity to inventory
+                line.Inventory.Quantity += line.Quantity;
+                _dbContext.OrderLines.Remove(line);
+                _dbContext.SaveChanges();
+
+                return true;
+            }
+            return false;
+        }
+
+        public Order GetOrderById(Guid orderId)
+        {
+            return _dbContext.Orders.Include(x=>x.Customer).FirstOrDefault(x => x.OrderId == orderId);
+        }
+
+        public List<Order> GetAllCustomerOrders(Guid customerId)
+        {
+            return _dbContext.Orders.Include(x => x.Customer).Where(x => x.Customer.UserId == customerId).ToList();
+        }
+
+        #endregion
         public void PopulateDb()
         {
             if (_dbContext.Locations.Count() < 1)

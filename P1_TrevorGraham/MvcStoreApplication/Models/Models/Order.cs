@@ -9,6 +9,8 @@ namespace Models
     {
         [Key]
         public Guid OrderId{get;set;}
+
+        public bool OrderIsComplete { get; set; }
         public DateTime Date{get;set;}
 
 

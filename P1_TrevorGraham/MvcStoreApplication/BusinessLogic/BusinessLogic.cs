@@ -48,7 +48,14 @@ namespace BusinessLogicLayer
             }
 
             Customer customer = _mapper.ConvertCustomerViewModelToCustomer(customerViewModel);
-            return _repository.AttemptAddCustomerToDb(customer);
+            if (_repository.AttemptAddCustomerToDb(customer))
+            {
+                if(AttemptSignIn(customerViewModel.Username,customerViewModel.Password))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         public bool CreateNewAdministrator(AdministratorViewModel adminViewModel)
         {
@@ -72,6 +79,7 @@ namespace BusinessLogicLayer
             //assign current location
             else if(user is Customer)
             {
+                //var customer = _repository.GetCustomerById(user.UserId);
 
                 //currentLocationId = _repository.GetCustomerById(user.UserId).DefaultLocation.LocationId;
                 SetCurrentLocation(_repository.GetCustomerById(user.UserId).DefaultLocation.LocationId);
@@ -85,7 +93,12 @@ namespace BusinessLogicLayer
             //currentUserId = user.UserId;
             SessionAssignCurrentUser(user.UserId);
             return true;
+        }
 
+        public void SignOut()
+        {
+            SessionClearCurrentUser();
+            SessionClearCurrentLocation();
         }
         /// <summary>
         /// This method is used to check if a user is signed into the session
@@ -213,7 +226,7 @@ namespace BusinessLogicLayer
             return viewModels;
         }
         #endregion
-        //locations
+
         #region locations
 
         public bool AddProductToInventory(InventoryViewModel viewModel)
@@ -227,6 +240,10 @@ namespace BusinessLogicLayer
         public LocationWithInventoriesViewModel GetInventoryDetails(Guid locationId)
         {
             Location location = _repository.GetLocationById(locationId);
+            if(location == null)
+            {
+                location = _repository.GetDefautLocation();
+            }
             List<InventoryViewModel> inventory = GetInventoryModelsForLocation(locationId);
             LocationWithInventoriesViewModel locationInventory = new LocationWithInventoriesViewModel()
             {
@@ -262,6 +279,17 @@ namespace BusinessLogicLayer
             //if unsuccessful
             return false;
         }
+        public Guid GetCurrentLocation()
+        {
+            if (SessionGetCurrentLocation() != null)
+            {
+                return (Guid)SessionGetCurrentLocation();
+            }
+            else
+            {
+                return _repository.GetDefautLocation().LocationId;
+            }
+        }
         public bool CreateNewLocation(LocationViewModel newLocationViewModel)
         {
             Location newLocation = new Location()
@@ -272,7 +300,153 @@ namespace BusinessLogicLayer
         }
         #endregion
 
+        #region orders
 
+        public OrderLineViewModel CreateOrderLine(InventoryViewModel inventoryViewModel)
+        {
+            OrderLineViewModel viewModel = new OrderLineViewModel()
+            {
+                InventoryId = inventoryViewModel.InventoryId,
+                Price = inventoryViewModel.Price,
+                ProductName = inventoryViewModel.ProductName,
+                Quantity = 0,
+                StoreName = inventoryViewModel.LocationName,
+                TotalPrice = 0,          
+            };
+            return viewModel;
+        }
+        public bool AddToCart(OrderLineViewModel orderLineViewModel)
+        {
+            if (!CurrentUserIsCustomer())
+            {
+                return false;
+            }
+            if (orderLineViewModel == null)
+            {
+                return false;
+            }
+            //check if orderline is empty
+            //check if order amount is greater than inventory amount
+            var dbInv = _repository.GetInventoryById(orderLineViewModel.InventoryId);
+            if (orderLineViewModel.Quantity <= 0||orderLineViewModel.Quantity>dbInv.Quantity)
+            {
+                return false;
+            }
+            //get current cart and line
+            var cart = _repository.GetOpenCartForCustomer((Guid)SessionGetCurrentUser());
+            var line = _mapper.ConvertOrderLineViewModelToOrderLine(orderLineViewModel);
+            //try to add to cart
+            return _repository.AddItemToCart(cart, line);
+            
+            //return false;
+
+        }
+
+        public OrderViewModel GetOrderViewModel(Guid orderId)
+        {
+            //if (!CurrentUserIsCustomer()) { return null; }
+            //if (SessionGetCurrentUser() != null) { return null; }
+            var order = _repository.GetOrderById(orderId);
+            //var loc = (Guid)SessionGetCurrentLocation();
+            var cust = (Guid)SessionGetCurrentUser();
+            //var cart = _repository.GetOpenCartForCustomer(cust);
+            var cartLines = _repository.GetOrderLinesForOrder(order.OrderId);
+            var cartLineViewModels = new List<OrderLineViewModel>();
+            double total = 0;
+            foreach (OrderLine line in cartLines)
+            {
+                var viewLine = _mapper.ConvertOrderLineToOrderLineViewModel(line);
+                total += viewLine.TotalPrice;
+                cartLineViewModels.Add(viewLine);
+            }
+
+            OrderViewModel viewModel = new OrderViewModel()
+            {
+                Date = DateTime.Now,
+                CustomerId = cust,
+                CustomerName = _repository.GetCustomerById(cust).Fname,
+                OrderId = order.OrderId,
+                //StoreName = _repository.GetLocationById(loc).Name,
+                TotalPrice = total,
+                orderLines = cartLineViewModels
+
+            };
+            if (cartLines.Count() > 0)
+            {
+                viewModel.StoreName = cartLines[0].Inventory.Location.Name;
+            }
+            return viewModel;
+        }
+        public OrderViewModel GetCart()
+        {
+            if (!CurrentUserIsCustomer()) { return null; }
+            //if (SessionGetCurrentUser() != null) { return null; }
+            var loc = (Guid)SessionGetCurrentLocation();
+            var cust = (Guid)SessionGetCurrentUser();
+            var cart = _repository.GetOpenCartForCustomer(cust);
+            var cartLines = _repository.GetOrderLinesForOrder(cart.OrderId);
+            var cartLineViewModels = new List<OrderLineViewModel>();
+            double total = 0;
+            foreach(OrderLine line in cartLines)
+            {
+                var viewLine = _mapper.ConvertOrderLineToOrderLineViewModel(line);
+                total += viewLine.TotalPrice;
+                cartLineViewModels.Add(viewLine);
+            }
+
+            OrderViewModel viewModel = new OrderViewModel()
+            {
+                Date = DateTime.Now,
+                CustomerId = cust,
+                CustomerName = _repository.GetCustomerById(cust).Fname,
+                OrderId = cart.OrderId,
+                StoreName = _repository.GetLocationById(loc).Name,
+                TotalPrice = total,
+                orderLines = cartLineViewModels
+                
+            };
+            return viewModel;
+        }
+
+        public bool AmountIsGreaterThanInventory(int quantity, InventoryViewModel inventoryViewModel)
+        {
+            if (inventoryViewModel != null)
+            {
+                var dbInv = _repository.GetInventoryById(inventoryViewModel.InventoryId);
+                if (dbInv != null)
+                {
+                    if (quantity < dbInv.Quantity)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        public List<OrderViewModel> GetAllOrderViewModels()
+        {
+            if (!CurrentUserIsCustomer()) { return null; }
+            var orders = _repository.GetAllCustomerOrders((Guid)SessionGetCurrentUser());
+            var viewModels = new List<OrderViewModel>();
+            foreach(Order order in orders)
+            {
+                var viewModel = GetOrderViewModel(order.OrderId);
+                viewModels.Add(viewModel);
+            }
+            return viewModels;
+        }
+        public bool Checkout()
+        {
+            if (CurrentUserIsCustomer())
+            {
+                var cart = _repository.GetOpenCartForCustomer((Guid)SessionGetCurrentUser());
+                return _repository.CompleteOrder(cart);
+
+            }
+            return false;
+        }
+
+        #endregion
         //session----------------------------------------------
         #region session
         /// <summary>
@@ -348,7 +522,7 @@ namespace BusinessLogicLayer
         {
             try
             {
-                var id = JsonConvert.DeserializeObject<Guid>(_session.GetString(currentUserKey));
+                var id = JsonConvert.DeserializeObject<Guid>(_session.GetString(currentLocationKey));
                 return id;
             }
             catch
