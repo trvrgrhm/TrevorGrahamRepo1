@@ -14,6 +14,7 @@ steps:
   displayName: 'Run a one-line script'
 
 - task: SonarCloudPrepare@1
+  displayName: 'preparing sonar cloud'
   inputs:
     SonarCloud: 'sonarcloud-connection'
     organization: 'trvrgrhm'
@@ -27,11 +28,14 @@ steps:
   displayName: 'Run a multi-line script'
 
 - task: DotNetCoreCLI@2
+  displayName: 'building project'
   inputs:
     command: 'build'
     projects: './P0_TrevorGraham/StoreApplication/StoreApplication.sln'
 - task: SonarCloudAnalyze@1
+  displayName: 'analyzing sonar cloud'
 - task: SonarCloudPublish@1
+  displayName: 'publishing sonar cloud'
   inputs:
     pollingTimeoutSec: '300'
 
