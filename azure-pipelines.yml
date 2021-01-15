@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 steps:
 - script: echo Hello, world!
@@ -31,7 +31,7 @@ steps:
   displayname: 'building project'
   inputs:
     command: 'build'
-    projects: 'P0_TrevorGraham/StoreApplication'
+    projects: './P0_TrevorGraham/StoreApplication/StoreApplication.sln'
 - task: SonarCloudAnalyze@1
   displayname: 'analyzing sonar cloud'
 - task: SonarCloudPublish@1
