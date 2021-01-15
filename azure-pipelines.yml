@@ -13,7 +13,31 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
+- task: SonarCloudPrepare@1
+  displayname: 'preparing sonar cloud'
+  inputs:
+    SonarCloud: 'sonarcloud-connection'
+    organization: 'trvrgrhm'
+    scannerMode: 'MSBuild'
+    projectKey: 'trvrgrhm_StoreAppPractice'
+    projectName: 'StoreAppPractice'
+
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
+
+- task: DotNetCoreCLI@2
+  displayname: 'building project'
+  inputs:
+    command: 'build'
+    projects: 'P0_TrevorGraham/StoreApplication'
+- task: SonarCloudAnalyze@1
+  displayname: 'analyzing sonar cloud'
+- task: SonarCloudPublish@1
+  displayname: 'publishing sonar cloud'
+  inputs:
+    pollingTimeoutSec: '300'
+
+
+
