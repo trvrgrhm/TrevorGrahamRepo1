@@ -1,3 +1,4 @@
+using BusinessLogicLayer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using RepositoryLayer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +30,11 @@ namespace ApiFollowAlongDemo
         {
 
             services.AddControllers();
+            services.AddScoped<DbContextClass>();
+            services.AddScoped<Repository>();
+            services.AddScoped<BusinessLogicClass>();
+            services.AddScoped<MapperClass>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiFollowAlongDemo", Version = "v1" });
