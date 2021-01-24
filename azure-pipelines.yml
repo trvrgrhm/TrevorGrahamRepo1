@@ -37,6 +37,7 @@ stages:
       inputs:
         command: 'build'
         projects: './P1_TrevorGraham/MvcStoreApplication/MvcStoreApplication.sln'
+
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -49,6 +50,12 @@ stages:
       inputs:
         pollingTimeoutSec: '300'
 
+    - task: DotNetCoreCLI@2
+      displayName: 'publish '
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        zipAfterPublish: true
 
 - stage: Deploy
   jobs:
