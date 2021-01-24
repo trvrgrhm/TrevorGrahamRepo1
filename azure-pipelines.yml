@@ -6,56 +6,68 @@
 trigger:
 - main
 
-pool:
-  vmImage: 'windows-latest'
+stages:
+- stage: Build
+  jobs:
+  - job: Build
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+    pool:
+      vmImage: 'windows-latest'
 
-- task: SonarCloudPrepare@1
-  displayName: 'preparing sonar cloud'
-  inputs:
-    SonarCloud: 'sonarcloud-connection'
-    organization: 'trvrgrhm'
-    scannerMode: 'MSBuild'
-    projectKey: 'trvrgrhm_StoreAppPractice'
-    projectName: 'StoreAppPractice'
+    steps:
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    - task: SonarCloudPrepare@1
+      displayName: 'preparing sonar cloud'
+      inputs:
+        SonarCloud: 'sonarcloud-connection'
+        organization: 'trvrgrhm'
+        scannerMode: 'MSBuild'
+        projectKey: 'trvrgrhm_StoreAppPractice'
+        projectName: 'StoreAppPractice'
 
-- task: DotNetCoreCLI@2
-  displayName: 'building project'
-  inputs:
-    command: 'build'
-    projects: './P1_TrevorGraham/MvcStoreApplication/MvcStoreApplication.sln'
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
-- task: SonarCloudAnalyze@1
-  displayName: 'analyzing sonar cloud'
-- task: SonarCloudPublish@1
-  displayName: 'publishing sonar cloud'
-  inputs:
-    pollingTimeoutSec: '300'
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
 
-- task: DownloadBuildArtifacts@0
-  inputs:
-    buildType: 'current'
-    downloadType: 'single'
-    artifactName: 'drop'
-    downloadPath: '$(System.ArtifactsDirectory)'
-- task: AzureRmWebAppDeployment@4
-  inputs:
-    ConnectionType: 'AzureRM'
-    azureSubscription: 'Trevor Subscription(d4f01992-52b9-4047-8f7d-34d2e08c6987)'
-    appType: 'webApp'
-    WebAppName: 'StoreApplication'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    - task: DotNetCoreCLI@2
+      displayName: 'building project'
+      inputs:
+        command: 'build'
+        projects: './P1_TrevorGraham/MvcStoreApplication/MvcStoreApplication.sln'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+    - task: SonarCloudAnalyze@1
+      displayName: 'analyzing sonar cloud'
+    - task: SonarCloudPublish@1
+      displayName: 'publishing sonar cloud'
+      inputs:
+        pollingTimeoutSec: '300'
+
+
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Trevor Subscription(d4f01992-52b9-4047-8f7d-34d2e08c6987)'
+        appType: 'webApp'
+        WebAppName: 'StoreApplication'
+        packageForLinux: '$(System.ArtifactsDirectory)/drop/*.zip'
 
 
