@@ -38,11 +38,6 @@ stages:
         command: 'build'
         projects: './P1_TrevorGraham/MvcStoreApplication/MvcStoreApplication.sln'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
     - task: SonarCloudAnalyze@1
       displayName: 'analyzing sonar cloud'
     - task: SonarCloudPublish@1
@@ -56,6 +51,13 @@ stages:
         command: 'publish'
         publishWebProjects: true
         zipAfterPublish: true
+
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
 
 - stage: Deploy
   jobs:
