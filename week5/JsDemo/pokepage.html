@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Document</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <style></style>
+</head>
+
+<body>
+    <div class="container">
+        <h3>Let's get some pokemons!</h3>
+        <form id="pokemon-form-id">
+            <div class="form-group"><input type="text" class="form-control" placeholder="Enter Pokemon name or Id"
+                    id="pokemonInput">
+                </div>
+                <input type="button" value="get pokemon" class="btn btn-secondary" onclick="GetPokemon()">
+        </form>
+        <div class="pokemonResult container">
+            <img src="" alt="">
+        </div>
+    </div>
+    <div class="container">
+        <h3>Let's get some digimon!</h3>
+        <form id="digimon-form-id">
+            <div class="form-group"><input type="text" class="form-control" placeholder="Enter Digimon name"
+                    id="digimonInput">
+                </div>
+                <input type="button" value="get digmon" class="btn btn-secondary" onclick="GetDigimon()">
+        </form>
+        <div class="digimonResult container">
+            <img src="" alt="">
+        </div>
+    </div>
+    <div class="container">
+        <h3>Functions in Js (a demo)</h3>
+        <div class="list-group">
+            <button class="btn btn-info list-group-item list-group-item-action" onclick="BasicFunction()">Calling a basic function</button>
+            <button class="btn btn-info list-group-item list-group-item-action" onclick="ParentFunction(Callback)">Calling a callback function</button>
+            <button class="btn btn-info list-group-item list-group-item-action" onclick="ParentFunction((name)=>alert('Hello '+name))">Passing an arrow function</button>
+            <button class="btn btn-info list-group-item list-group-item-action" onclick="(()=>(console.log('this function gets immediately invoked')))()">Calling an IIFE</button>
+        </div>
+    </div>
+    <div class="container">
+        <h3>Closures in JS</h3>
+        <h4>Encapsulation with shared using IIFEs</h4>
+        <p>Open the log. Whichever button you click increases the count on the stored variable</p>
+        <button class="btn btn-warning" onclick="console.log(Outer())">Click this.</button>
+        <button class="btn btn-warning" onclick="console.log(Outer())">Now click this.</button>
+
+        <h4>Initializing new closures</h4>
+        <p>Open the log. Whichever button you click increases the count on a new closure's stored variable.</p>
+        <button class="btn btn-warning" onclick="console.log(add())">Click this.</button>
+        <button class="btn btn-warning" onclick="console.log(addAgain())">Now click this.</button>
+    </div>
+    <!-- javascript -->
+    <script>
+        function GetPokemon(){
+            let xhr = new XMLHttpRequest();
+            let pokemon = {};
+            let pokemonInput = document.querySelector('#pokemonInput').value;
+            xhr.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status==200){
+                    pokemon = JSON.parse(xhr.responseText);
+                    document.querySelector('.pokemonResult img').setAttribute('src',pokemon.sprites.front_default);
+                    document.querySelectorAll('.pokemonResult caption').forEach(element => element.remove());
+                    let caption = document.createElement('caption');
+                    let pokeName = document.createTextNode(pokemon.forms[0].name);
+                    caption.appendChild(pokeName);
+                    document.querySelector('.pokemonResult').appendChild(caption);
+                    document.querySelector('#pokemonInput').value = '';
+                }
+            }
+            xhr.open("GET",`https://pokeapi.co/api/v2/pokemon/${pokemonInput}`,true);
+            xhr.send();
+        }
+    </script>
+    <script src="marchild.js"></script>
+    <script src="digimonfetch.js"></script>
+
+    <script>  
+        $(window).ready(function() { 
+        $("#pokemon-form-id").on("keypress", function (event) { 
+            console.log("aaya"); 
+            var keyPressed = event.keyCode || event.which; 
+            if (keyPressed === 13) { 
+                GetPokemon();
+                alert("You pressed the Enter key!!"); 
+                event.preventDefault(); 
+                return false; 
+            } 
+        }); 
+        }); 
+  
+    </script>
+
+    <script>  
+        $(window).ready(function() { 
+        $("#digimon-form-id").on("keypress", function (event) { 
+            console.log("aaya"); 
+            var keyPressed = event.keyCode || event.which; 
+            if (keyPressed === 13) { 
+                GetDigimon();
+                alert("You pressed the Enter key!!"); 
+                event.preventDefault(); 
+                return false; 
+            } 
+        }); 
+        }); 
+  
+    </script>
+
+</body>
+
+</html>
