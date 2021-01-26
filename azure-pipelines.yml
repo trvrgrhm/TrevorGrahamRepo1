@@ -45,12 +45,12 @@ stages:
       inputs:
         pollingTimeoutSec: '300'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'publish '
-      inputs:
-        command: 'publish'
-        publishWebProjects: true
-        zipAfterPublish: true
+    # - task: DotNetCoreCLI@2
+    #   displayName: 'publish '
+    #   inputs:
+    #     command: 'publish'
+    #     publishWebProjects: true
+    #     zipAfterPublish: true
 
     - task: AzureWebApp@1
       inputs:
