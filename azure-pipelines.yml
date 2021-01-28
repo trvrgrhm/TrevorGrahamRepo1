@@ -56,7 +56,7 @@ stages:
         azureSubscription: 'Trevor Subscription(d4f01992-52b9-4047-8f7d-34d2e08c6987)'
         appType: 'webApp'
         appName: 'StoreApplication'
-        package: '$(System.DefaultWorkingDirectory)/**/MvcStoreApplication.zip'
+        package: '$(System.DefaultWorkingDirectory)/**/*.zip'
         deploymentMethod: 'auto'
 
 #     - task: PublishBuildArtifacts@1
